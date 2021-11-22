@@ -15,8 +15,8 @@ typedef struct {
 } set_t;
 
 typedef struct {
-    char firstItem;
-    char secondItem;
+    char firstItem[30];
+    char secondItem[30];
 } setItem;
 
 typedef struct {
@@ -90,14 +90,15 @@ int main(int argc, char *argv[]) {
     printf("Arg: %s\n", argv[1]);
     FILE *file;
     file = fopen(argv[1], "r");
-    int lineNum = 1, cardinality, sequence;
-    bool U_found = false, R_found = false, S_found = false;
+    int lineNum = 1, cardinality, sequence, itemCount;
+    bool U_found = false, R_found = false, S_found = false, firstItem, secondItem;
     //int string[][];
     universum universum;
     universum.cardinality = 0;
     set_t set;
     set.cardinality = 0;
     relation relation;
+    setItem item;
     while(!feof(file) || lineNum > 1000){
         int letter = fgetc(file);
         if(letter == EOF) break;
@@ -116,8 +117,8 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if(letter == '\n'){
-            U_found = false; R_found = false; S_found = false;
-            lineNum++; sequence = 0;
+            U_found = false; R_found = false; S_found = false; firstItem = false; secondItem = false;
+            lineNum++; sequence = 0; itemCount = 0;
             printf("\n%d:  ", lineNum);
             continue;
         }
@@ -144,7 +145,36 @@ int main(int argc, char *argv[]) {
         }
         if(R_found){
             relation.id = lineNum;
-            if()
+            //neukonceny prvek
+            if(letter == 41 && firstItem == true) exit(EXIT_FAILURE);
+            if(letter == 41) {
+                firstItem = true;
+                relation.cardinality++;
+                itemCount++;
+                continue;
+            }
+            if(letter == 32){
+                firstItem = false;
+                secondItem = true;
+                sequence = 0;
+                continue;
+            }
+            //nezacnuty prvek
+            if(letter == 41 && secondItem == true) exit(EXIT_FAILURE);
+            if(letter == 42){
+                firstItem = false;
+                secondItem = false;
+                relation.relationItems[itemCount] = item;
+                continue;
+            }
+            if(firstItem){
+                item.firstItem[sequence] = letter;
+                sequence++;
+            }
+            if(secondItem){
+                item.secondItem[sequence] = letter;
+                sequence++;
+            }
         }
     }
     printf("\ntest\n");
