@@ -95,9 +95,13 @@ int main(int argc, char *argv[]) {
     //int string[][];
     universum universum;
     universum.cardinality = 0;
+    set_t set;
+    set.cardinality = 0;
+    relation relation;
     while(!feof(file) || lineNum > 1000){
         int letter = fgetc(file);
-        if(!(letter >= 'A' && letter <= 'Z') && !(letter >= 'a' && letter <= 'z') && letter != 32 && !(letter >= '0' && letter <= '9') && letter != '\n') exit(EXIT_FAILURE);
+        if(letter == EOF) break;
+        if(!(letter >= 'A' && letter <= 'Z') && !(letter >= 'a' && letter <= 'z') && letter != 32 && !(letter >= '0' && letter <= '9') && letter != '\n' && (letter != 40 || letter != 41)) exit(EXIT_FAILURE);
         //printf("\n line: %d %c", lineNum, letter);
         if(letter == 'U') {
             U_found = true;
@@ -123,76 +127,31 @@ int main(int argc, char *argv[]) {
                 sequence = 0;
                 printf("%d", universum.cardinality);
             } else {
-                sequence++;
                 universum.items[universum.cardinality][sequence] = letter;
+                sequence++;
+            }
+        }
+        if(S_found){
+            set.id = lineNum;
+            if(letter == 32){
+                sequence = 0;
+                //printf("%c", letter);
+                set.cardinality++;
+            } else {
+                set.items[set.cardinality][sequence] = letter;
+                sequence++;
             }
         }
         if(R_found){
-            //universum universum;
-            if(letter != 32){
-                sequence++;
-                printf("%c", letter);
-            }
+            relation.id = lineNum;
+            if()
         }
-        /*
-
-
-
-        string[lineNum][]
-        int type = fgetc(file);
-        if(letter == 'U'){
-            universum universum;
-            while (!feof(file) || letter != '\n'){
-                //letter = fgetc(file);
-                if(!(letter > 'A' && letter < 'Z') && !(letter > 'a' && letter < 'z') && letter != 32 && !(letter >= '0' && letter <= '9')) exit(EXIT_FAILURE);
-                if(letter != 32){
-                    sequence++;
-                    universum.items[universum.cardinality][sequence] = letter;
-                    continue;
-                }
-                universum.cardinality++;
-                break;
-            }
-            for(int i = 0; i < 4; i++){
-                printf("\n %d prvek: ", i);
-                for(int j = 0; i<30;j++){
-                    printf("%c",universum.items[i][j]);
-                }
-            }
-        }
-
-        if(letter == 'S'){
-            set_t set;
-            set.id = lineNum;
-            while (!feof(file) || letter != '\n'){
-                letter = fgetc(file);
-                if(!(letter > 'A' && letter < 'Z') && !(letter > 'a' && letter < 'z') && letter != 32 && !(letter >= '0' && letter <= '9')) exit(EXIT_FAILURE);
-                if(letter != 32){
-                    sequence++;
-                    set.items[set.cardinality][sequence] = letter;
-                    continue;
-                }
-                set.cardinality++;
-                break;
-            }
-        }
-        lineNum++;
-     /*   while(!feof(file) || letter != '\n'){
-            letter = fgetc(file);
-            printf("%c", letter);
-            if(!(letter > 'A' && letter < 'Z') && !(letter > 'a' && letter < 'z') && letter != 32 && !(letter >= '0' && letter <= '9')) exit(EXIT_FAILURE);
-            if(letter == 32) sequence = 0; break;
-            sequence++;
-            temp[sequence] = letter;
-        }
-        string[lineNum][];
-        lineNum++;*/
     }
+    printf("\ntest\n");
     fclose(file);
-    printf("test");
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 5; i++){
         printf("\n %d prvek: ", i);
-        for(int j = 0; j < 30;j++){
+        for(int j = 0; j < 1;j++){
             printf("%c",universum.items[i][j]);
         }
     }
