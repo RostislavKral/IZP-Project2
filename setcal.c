@@ -1,28 +1,29 @@
 #include <stdio.h>
 #include "stdbool.h"
 #include <stdlib.h>
+#include <malloc.h>
 #include <string.h>
 
 typedef struct {
     int cardinality;
-    char** items;
+    char **items;
 } universum;
 
 typedef struct {
     int id;
     int cardinality;
-    char items[][30];
+    char **items;
 } set_t;
 
 typedef struct {
-    char firstItem[30];
-    char secondItem[30];
+    char *firstItem;
+    char *secondItem;
 } setItem;
 
 typedef struct {
     int id;
     int cardinality;
-    setItem relationItems[];
+    setItem *relationItems;
 } relation;
 
 void initSet_t(int size) {
@@ -99,7 +100,8 @@ int main(int argc, char *argv[]) {
     set.cardinality = 0;
     relation relation;
     setItem item;
-    int*tmpItems; char*tmpItem;
+    //int*tmpItems; char*tmpItem;
+    char *tmpStr = malloc(1);
     while(!feof(file) || lineNum > 1000){
         int letter = fgetc(file);
         if(letter == EOF) break;
@@ -107,19 +109,21 @@ int main(int argc, char *argv[]) {
         //printf("\n line: %d %c", lineNum, letter);
         if(letter == 'U') {
             U_found = true;
-            universum.items = malloc(sizeof(int));
+            universum.items = malloc(0);
             continue;
         }
         if(letter == 'R') {
             R_found = true;
+            relation.relationItems = malloc(0);
             continue;
         }
         if(letter == 'S') {
             S_found = true;
+            set.items = malloc(0);
             continue;
         }
         if(letter == '\n'){
-            universum.items[universum.cardinality][0] = *tmpItem;
+            //universum.items[universum.cardinality][0] = *tmpItem;
             U_found = false; R_found = false; S_found = false; firstItem = false; secondItem = false;
             lineNum++; sequence = 0; itemCount = 0;
             printf("\n%d:  ", lineNum);
@@ -127,20 +131,20 @@ int main(int argc, char *argv[]) {
         }
         if(U_found){
             if(letter == 32) {
-                universum.cardinality++;
                 sequence = 0;
-                printf("%d", universum.cardinality);
-                universum.items = realloc(universum.items,universum.cardinality*sizeof(int));
-                tmpItem = NULL;
+                //printf("%c", letter);
+                printf("\n*%s*\n", tmpStr);
+                ++universum.cardinality;
+                universum.items = realloc(universum.items, universum.cardinality * sizeof(char*));
+
+                *(universum.items + (universum.cardinality - 1)) = tmpStr;
+
+                sequence = 0;
+                tmpStr = NULL;
             } else {
-                //universum.items[universum.cardinality][sequence] = letter;
-                tmpItem[sequence] = letter;
-                sequence++;
-                if(tmpItem == NULL){
-                    tmpItem = malloc(sequence * sizeof(int));
-                } else {
-                    tmpItem = realloc(tmpItem,sequence * sizeof(int));
-                }
+                tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
+                *(tmpStr + sequence) = letter;
+                ++sequence;
             }
         }
         if(S_found){
@@ -148,10 +152,18 @@ int main(int argc, char *argv[]) {
             if(letter == 32){
                 sequence = 0;
                 //printf("%c", letter);
-                set.cardinality++;
+                printf("\n*%s*\n", tmpStr);
+                ++set.cardinality;
+                set.items = realloc(set.items, set.cardinality * sizeof(char*));
+
+                *(set.items + (set.cardinality - 1)) = tmpStr;
+
+                sequence = 0;
+                tmpStr = NULL;
             } else {
-                set.items[set.cardinality][sequence] = letter;
-                sequence++;
+                tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
+                *(tmpStr + sequence) = letter;
+                ++sequence;
             }
         }
         if(R_found){
@@ -162,12 +174,15 @@ int main(int argc, char *argv[]) {
                 firstItem = true;
                 relation.cardinality++;
                 itemCount++;
+                item.firstItem = malloc(0);
                 continue;
             }
             if(letter == 32){
+                printf("\n*%s*\n", tmpStr);
                 firstItem = false;
                 secondItem = true;
                 sequence = 0;
+                item.secondItem = malloc(0);
                 continue;
             }
             //nezacnuty prvek
@@ -176,13 +191,16 @@ int main(int argc, char *argv[]) {
                 firstItem = false;
                 secondItem = false;
                 relation.relationItems[itemCount] = item;
+                relation.relationItems = realloc(relation.relationItems, relation.cardinality * sizeof(char*));
                 continue;
             }
             if(firstItem){
+                tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
                 item.firstItem[sequence] = letter;
                 sequence++;
             }
             if(secondItem){
+                tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
                 item.secondItem[sequence] = letter;
                 sequence++;
             }
@@ -196,7 +214,7 @@ int main(int argc, char *argv[]) {
             printf("%c",universum.items[i][j]);
         }
     }
-
+    free(tmpStr);
 /*
     set_t set;
     set.cardinality = 1;
