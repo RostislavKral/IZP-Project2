@@ -5,7 +5,7 @@
 
 typedef struct {
     int cardinality;
-    char items[][30];
+    char** items;
 } universum;
 
 typedef struct {
@@ -99,6 +99,7 @@ int main(int argc, char *argv[]) {
     set.cardinality = 0;
     relation relation;
     setItem item;
+    int*tmpItems; char*tmpItem;
     while(!feof(file) || lineNum > 1000){
         int letter = fgetc(file);
         if(letter == EOF) break;
@@ -106,6 +107,7 @@ int main(int argc, char *argv[]) {
         //printf("\n line: %d %c", lineNum, letter);
         if(letter == 'U') {
             U_found = true;
+            universum.items = malloc(sizeof(int));
             continue;
         }
         if(letter == 'R') {
@@ -117,6 +119,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
         if(letter == '\n'){
+            universum.items[universum.cardinality][0] = *tmpItem;
             U_found = false; R_found = false; S_found = false; firstItem = false; secondItem = false;
             lineNum++; sequence = 0; itemCount = 0;
             printf("\n%d:  ", lineNum);
@@ -127,9 +130,17 @@ int main(int argc, char *argv[]) {
                 universum.cardinality++;
                 sequence = 0;
                 printf("%d", universum.cardinality);
+                universum.items = realloc(universum.items,universum.cardinality*sizeof(int));
+                tmpItem = NULL;
             } else {
-                universum.items[universum.cardinality][sequence] = letter;
+                //universum.items[universum.cardinality][sequence] = letter;
+                tmpItem[sequence] = letter;
                 sequence++;
+                if(tmpItem == NULL){
+                    tmpItem = malloc(sequence * sizeof(int));
+                } else {
+                    tmpItem = realloc(tmpItem,sequence * sizeof(int));
+                }
             }
         }
         if(S_found){
