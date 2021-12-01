@@ -122,25 +122,38 @@ int main(int argc, char *argv[]) {
             set.items = malloc(0);
             continue;
         }
-        if(letter == '\n'){
-            //universum.items[universum.cardinality][0] = *tmpItem;
-            U_found = false; R_found = false; S_found = false; firstItem = false; secondItem = false;
-            lineNum++; sequence = 0; itemCount = 0;
-            printf("\n%d:  ", lineNum);
-            continue;
-        }
+
         if(U_found){
-            if(letter == 32) {
+            if (letter == 32 || letter == '\n') {
+                if (universum.cardinality == 0) {
+                    universum.cardinality++;
+                    continue;
+                }
                 sequence = 0;
                 //printf("%c", letter);
                 printf("\n*%s*\n", tmpStr);
                 ++universum.cardinality;
-                universum.items = realloc(universum.items, universum.cardinality * sizeof(char*));
+                universum.items = realloc(universum.items, universum.cardinality * sizeof(char *));
 
                 *(universum.items + (universum.cardinality - 1)) = tmpStr;
 
                 sequence = 0;
                 tmpStr = NULL;
+
+                if (letter == '\n') {
+                    //universum.items[universum.cardinality][0] = *tmpItem;
+
+                    U_found = false;
+                    R_found = false;
+                    S_found = false;
+                    firstItem = false;
+                    secondItem = false;
+                    lineNum++;
+                    sequence = 0;
+                    itemCount = 0;
+                    printf("\n%d:  ", lineNum);
+                    continue;
+                }
             } else {
                 tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
                 *(tmpStr + sequence) = letter;
@@ -208,10 +221,10 @@ int main(int argc, char *argv[]) {
     }
     printf("\ntest\n");
     fclose(file);
-    for(int i = 0; i < 5; i++){
+    for (int i = 1; i <= 5; i++) {
         printf("\n %d prvek: ", i);
-        for(int j = 0; j < 1;j++){
-            printf("%c",universum.items[i][j]);
+        for (int j = 0; j < 1; j++) {
+            printf("%c", universum.items[i][j]);
         }
     }
     free(tmpStr);
