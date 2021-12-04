@@ -10,11 +10,23 @@ typedef struct {
     int cardinality;
     char **items;
 } Set;
-void *setCreator(Set *set){
-    //Set set = malloc(sizeof(Set));
+typedef struct {
+    int length;
+    Set **sets;
+} SetArray;
+void addToSetArray(SetArray *setArray, Set *set){
+    setArray->length++;
+    setArray->sets = realloc(setArray->sets, (setArray->length + 1)*sizeof(Set*));
+    if(setArray->sets == NULL) exit(EXIT_FAILURE);
+    //setArray->sets[setArray->length-1] = &set;
+    *(setArray->sets + (setArray->length - 1)) = set;
+}
+Set *setCreator(){
+    Set *set = malloc(sizeof(Set));
     set->id = 0;
     set->cardinality = 0;
     set->items = malloc(1);
+    return set;
 }
 void *setDestructor(Set *set){
     if(set){
@@ -30,11 +42,8 @@ void *setDestructor(Set *set){
 }
 void setIncrement(Set *set, char *item){
     ++(set->cardinality);
-    //printf("item %s, card %d\n", item, set->cardinality);
-    //int *ptr = NULL;
     set->items = realloc(set->items, (set->cardinality) * sizeof(char*));
     if(set->items == NULL) exit(EXIT_FAILURE);
-    //if(ptr != *set->items) set->items = ptr;
     *(set->items + (set->cardinality - 1)) = item;
 }
 int main (int argc, char *argv[]){
@@ -42,50 +51,76 @@ int main (int argc, char *argv[]){
         fprintf(stderr, "Invalid number of args\n");
         exit(EXIT_FAILURE);
     }
-    char *tmpStr = malloc(1);
+
     printf("Arg: %s\n", argv[1]);
     FILE *file;
     file = fopen(argv[1], "r");
+
+    SetArray setArray;
+    setArray.length = 0;
+    setArray.sets = NULL;
+
     char c, type = ' ';
-    char **test = malloc(0);
     int cardinality = 0, sequence = 0, lineNum = 0, lineChar = 0;
-    Set set;
-    setCreator(&set);
+    Set *universum;
+    universum = setCreator();
+    Set *set = setCreator();
+    Set *tmpSet;
+    char *tmpStr = malloc(1);
+
     while(true){
         c = fgetc(file);
         lineChar++;
-        if(lineChar == 2)continue;
         if(feof(file))break;
+        if(lineChar == 2)continue;
         if(type == ' ') {
             type = c;
+        }
+        if((type == 'S' || type == 'U')&& lineChar == 1){
+            tmpSet = setCreator();
+            printf("Set created \n");
             continue;
         }
-        //printf("%d", lineNum);
         if(c == ' ' || c == '\n'){
             ++cardinality;
-            printf(">> %s  %d\n", tmpStr, sequence);
+            //printf(">> %s  %d\n", tmpStr, sequence);
             sequence = 0;
-            setIncrement(&set, tmpStr);
-            /*test = realloc(test, cardinality*sizeof (char*));
-            *(test + (cardinality-1)) = tmpStr;*/
+
+            setIncrement(tmpSet, tmpStr);
             tmpStr = NULL;
             if(c == '\n'){
                 lineNum++;
                 lineChar = 0;
                 type = ' ';
                 cardinality = 0;
-               // free(test);
+                tmpSet->id = lineNum;
+                //addToSetArray(&setArray, tmpSet);
+                setArray.length++;
+                setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set*));
+                //printf("tmp card %d", tmpSet->cardinality);
+                *(setArray.sets + (setArray.length - 1)) = tmpSet;
             }
             continue;
         }
-        tmpStr = realloc(tmpStr, (sequence+1)*sizeof (char*));
+        tmpStr = realloc(tmpStr, (sequence+1)*sizeof (char));
         if(tmpStr == NULL) exit(EXIT_FAILURE);
         *(tmpStr + sequence) = c;
         ++sequence;
         //printf("\n %c \n", tmpStr);
     }
-    for (int i = 0; i < 12; ++i) {
-        printf("%s\n", set.items[i]);
+
+    for (int i = 0; i < universum->cardinality; ++i) {
+        printf("%s\n", universum->items[i]);
     }
+    for (int i = 0; i < setArray.length; ++i) {
+        printf("set %d (", setArray.sets[i]->id);
+        for (int j = 0; j < setArray.sets[i]->cardinality; ++j) {
+            printf(" %s ", setArray.sets[i]->items[j]);
+        }
+        printf(")\n");
+    }
+   /* for (int i = 0; i < 12; ++i) {
+        printf("%s\n", set->items[i]);
+    }*/
     //printf("test: %d", *tmpStr);
 }
