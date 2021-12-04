@@ -104,20 +104,26 @@ int main (int argc, char *argv[]) {
     char *tmpStr = malloc(1);
     char *tmpRelItem = NULL;
     bool first = false, second = false;
-
+    char *command = NULL;
+    char **cmdArgs = NULL;
+    int cmdNum = 0;
     while (true) {
         c = fgetc(file);
         lineChar++;
         if (feof(file))break;
         if (lineChar == 2)continue;
         if (type == ' ') {
+            if (c != 'U' && c != 'C' && c != 'R' && c != 'S'){
+                printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum+1);
+                exit(EXIT_FAILURE);
+            }
             type = c;
             continue;
         }
+        // TODO: když není řádek ukončen \n tak se celý řádek nepropíše
         if (c == ' ' || c == '\n') {
             ++cardinality;
             sequence = 0;
-
             if(type == 'U'){
                 setIncrement(universum, tmpStr);
             }
@@ -133,11 +139,18 @@ int main (int argc, char *argv[]) {
                 if (second) {
                     tmpRelPair->second = tmpStr;
                     second = false;
-                    //printf("%s \n", tmpRelPair->first);
-                    //printf("%s \n", tmpRelPair->second);
                     relIncrement(tmpRel, tmpRelPair);
                     tmpRelPair = NULL;
                 }
+            }
+            if(type == 'C'){
+                if(command != NULL) {
+                    cmdNum++;
+                    cmdArgs = realloc(cmdArgs, sizeof(char*));
+                    if(cmdArgs == NULL )exit(EXIT_FAILURE);
+                    *(cmdArgs + (cmdNum - 1)) = tmpStr;
+                }
+                if(command == NULL) command = tmpStr;
             }
             tmpStr = NULL;
             if (c == '\n') {
@@ -158,7 +171,21 @@ int main (int argc, char *argv[]) {
                     *(relArray.relations + (relArray.length - 1)) = tmpRel;
                     tmpRel = relCreator();
                 }
+                if(type == 'C'){
+                    if(!strcmp(command, "minus")){
+                        //volani na funkci
+                    }
+                    printf("Command: %s Args: ", command);
+                    for (int i = 0; i < cmdNum; i++){
+                        printf(" %s ", cmdArgs[i]);
+                    }
+                    printf("\n");
+                    command = NULL;
+                    cmdNum = 0;
+                    cmdArgs = NULL;
+                }
                 type = ' ';
+                //command = NULL;
             }
             continue;
         }
