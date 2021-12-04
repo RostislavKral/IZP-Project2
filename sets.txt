@@ -1,4 +1,4 @@
 U 1 2 3 4 5 6 7 8 9
 S aaaa bbbb cc1c asdf rrasdfasdfasdf aaaa aaafgfgf
 S xxxxxxx zzzzzzzzz uuuuuuuuuu
-R (rel1 rel2) (rel3 rel4)
+R (rel1 rel2) (rel3 rel4) (rel5 rel6)

@@ -126,16 +126,17 @@ int main (int argc, char *argv[]) {
             }
             if(type == 'R'){
                 if(first){
-                    tmpRelItem = tmpStr;
+                    tmpRelPair = malloc(sizeof (tmpStr));
+                    tmpRelPair->first = tmpStr;
                     first = false;
                 }
                 if (second) {
-                    tmpRelPair->first = tmpRelItem;
                     tmpRelPair->second = tmpStr;
                     second = false;
-                    printf("%s \n", tmpRelPair->first);
-                    printf("%s \n", tmpRelPair->second);
+                    //printf("%s \n", tmpRelPair->first);
+                    //printf("%s \n", tmpRelPair->second);
                     relIncrement(tmpRel, tmpRelPair);
+                    tmpRelPair = NULL;
                 }
             }
             tmpStr = NULL;
