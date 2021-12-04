@@ -14,13 +14,20 @@ typedef struct {
     int length;
     Set **sets;
 } SetArray;
-void addToSetArray(SetArray *setArray, Set *set){
-    setArray->length++;
-    setArray->sets = realloc(setArray->sets, (setArray->length + 1)*sizeof(Set*));
-    if(setArray->sets == NULL) exit(EXIT_FAILURE);
-    //setArray->sets[setArray->length-1] = &set;
-    *(setArray->sets + (setArray->length - 1)) = set;
-}
+typedef struct {
+    char *first;
+    char *second;
+} RelationPair;
+typedef struct {
+    int cardinality;
+    RelationPair **items;
+} Relation;
+typedef struct {
+    int id;
+    int length;
+    Relation **relations;
+}RelationArray;
+
 Set *setCreator(){
     Set *set = malloc(sizeof(Set));
     set->id = 0;
@@ -46,8 +53,8 @@ void setIncrement(Set *set, char *item){
     if(set->items == NULL) exit(EXIT_FAILURE);
     *(set->items + (set->cardinality - 1)) = item;
 }
-int main (int argc, char *argv[]){
-    if(argc != 2){
+int main (int argc, char *argv[]) {
+    if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
         exit(EXIT_FAILURE);
     }
@@ -60,58 +67,69 @@ int main (int argc, char *argv[]){
     setArray.length = 0;
     setArray.sets = NULL;
 
+    RelationArray relArray;
+    relArray.length = 0;
+    relArray.relations = NULL;
+
+    Set *universum;
+    Set *tmpSet;
+    universum = setCreator();
+    tmpSet = setCreator();
+
     char c, type = ' ';
     int cardinality = 0, sequence = 0, lineNum = 0, lineChar = 0;
-    Set *universum;
-    universum = setCreator();
-    Set *set = setCreator();
-    Set *tmpSet;
     char *tmpStr = malloc(1);
 
-    while(true){
+    while (true) {
         c = fgetc(file);
         lineChar++;
-        if(feof(file))break;
-        if(lineChar == 2)continue;
-        if(type == ' ') {
+        if (feof(file))break;
+        if (lineChar == 2)continue;
+        if (type == ' ') {
             type = c;
-        }
-        if((type == 'S' || type == 'U')&& lineChar == 1){
-            tmpSet = setCreator();
-            printf("Set created \n");
             continue;
         }
-        if(c == ' ' || c == '\n'){
+        if (c == ' ' || c == '\n') {
             ++cardinality;
-            //printf(">> %s  %d\n", tmpStr, sequence);
             sequence = 0;
 
-            setIncrement(tmpSet, tmpStr);
+            if(type == 'U'){
+                setIncrement(universum, tmpStr);
+            } else if(type == 'R') {
+                setIncrement(tmpSet, tmpStr);
+            } else {
+                setIncrement(tmpSet, tmpStr);
+            }
             tmpStr = NULL;
-            if(c == '\n'){
+            if (c == '\n') {
                 lineNum++;
                 lineChar = 0;
-                type = ' ';
                 cardinality = 0;
-                tmpSet->id = lineNum;
-                //addToSetArray(&setArray, tmpSet);
-                setArray.length++;
-                setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set*));
-                //printf("tmp card %d", tmpSet->cardinality);
-                *(setArray.sets + (setArray.length - 1)) = tmpSet;
+                if(type == 'S'){
+                    tmpSet->id = lineNum;
+                    setArray.length++;
+                    setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set *));
+                    *(setArray.sets + (setArray.length - 1)) = tmpSet;
+                }
+                type = ' ';
+                tmpSet = setCreator();
             }
             continue;
         }
-        tmpStr = realloc(tmpStr, (sequence+1)*sizeof (char));
-        if(tmpStr == NULL) exit(EXIT_FAILURE);
+        if(type == 'R'){
+            if(c == '(') continue;
+            if(c == ')') continue;
+        }
+        tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
+        if (tmpStr == NULL) exit(EXIT_FAILURE);
         *(tmpStr + sequence) = c;
         ++sequence;
-        //printf("\n %c \n", tmpStr);
     }
-
+    printf("Universum: ");
     for (int i = 0; i < universum->cardinality; ++i) {
-        printf("%s\n", universum->items[i]);
+        printf("%s ", universum->items[i]);
     }
+    printf("\n");
     for (int i = 0; i < setArray.length; ++i) {
         printf("set %d (", setArray.sets[i]->id);
         for (int j = 0; j < setArray.sets[i]->cardinality; ++j) {
@@ -119,8 +137,4 @@ int main (int argc, char *argv[]){
         }
         printf(")\n");
     }
-   /* for (int i = 0; i < 12; ++i) {
-        printf("%s\n", set->items[i]);
-    }*/
-    //printf("test: %d", *tmpStr);
 }
