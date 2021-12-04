@@ -82,6 +82,33 @@ void isReflexive(Relation *relation, Set *universum){
     printf("\n");
 
 };
+bool empty(Set *set) {
+    printf("noice\n");
+}
+int card(Set *set) {
+    printf("noice\n");
+}
+int complement(Set *set) {
+    printf("noice\n");
+}
+void _union(Set *setA, Set *setB) {
+    printf("noice\n");
+}
+int intersect(Set *setA, Set *setB) {
+    printf("noice\n");
+}
+int minus(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+bool subseteq(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+bool subset(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+bool equals(Set *setA,Set *setB) {
+    printf("noice\n");
+}
 void isSymmetric(Relation *relation){
     printf("noice\n");
 };
@@ -229,6 +256,7 @@ int main (int argc, char *argv[]) {
                     if(cmdArgs[0] != NULL) firstArg = atoi(cmdArgs[0]);
                     if(cmdArgs[1] != NULL) secondArg = atoi(cmdArgs[1]);
                     if(cmdArgs[2] != NULL) thirdArg = atoi(cmdArgs[2]);
+                    //Relace
                     if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
                     if(strcmp(command, "symmetric") == 0){isSymmetric(findRelation(&relArray,firstArg));}
                     if(strcmp(command, "antisymmetric") == 0){isAntiSymmetric(findRelation(&relArray,firstArg));}
@@ -239,6 +267,17 @@ int main (int argc, char *argv[]) {
                     if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
                     if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
                     if(strcmp(command, "bijective") == 0){isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    //Mnoziny
+                    if(strcmp(command, "empty") == 0){empty(findSet(&setArray,firstArg));}
+                    if(strcmp(command, "card") == 0){card(findSet(&setArray,firstArg));}
+                    if(strcmp(command, "complement") == 0){complement(findSet(&setArray,firstArg));}
+                    if(strcmp(command, "union") == 0){_union(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "intersect") == 0){intersect(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "minus") == 0){minus(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "subseteq") == 0){subseteq(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "subset") == 0){subset(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "equals") == 0){equals(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+
                     printf("Command: %s Args:", command);
                     for (int i = 0; i < cmdNum; i++){
                         printf(" %s ", cmdArgs[i]);
