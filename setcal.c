@@ -72,6 +72,18 @@ void relIncrement(Relation *rel, RelationPair *tmpRelPair){
     if(rel->items == NULL) exit(EXIT_FAILURE);
     *(rel->items + (rel->cardinality - 1)) = tmpRelPair;
 }
+
+void isReflexive(Relation *relation, Set *universum);
+void isSymmetric(Relation *relation);
+void isAntiSymmetric(Relation *relation);
+void isTransitive(Relation *relation);
+void isFunction(Relation *relation);
+void domain(Relation *relation);
+void codomain(Relation *relation);
+void isInjective(Relation *relation, Set *setA, Set *setB);
+void isSurjective(Relation *relation, Set *setA, Set *setB);
+void isBijective(Relation *relation, Set *setA, Set *setB);
+
 int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
