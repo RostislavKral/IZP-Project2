@@ -1,3 +1,4 @@
-U aaa bbb ccc
-S aaa bbb
-S aaa ccc
+U a b c
+S a b
+S a c
+R (a a) (b b) (c c)

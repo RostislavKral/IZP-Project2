@@ -26,65 +26,81 @@ typedef struct {
 typedef struct {
     int length;
     Relation **relations;
-}RelationArray;
+} RelationArray;
 
-Set *setCreator(){
+Set *setCreator() {
     Set *set = malloc(sizeof(Set));
     set->id = 0;
     set->cardinality = 0;
     set->items = malloc(1);
     return set;
 }
-Relation *relCreator(){
+
+Relation *relCreator() {
     Relation *rel = malloc(sizeof(Relation));
     rel->items = malloc(1);
     rel->cardinality = 0;
-    rel->id =0;
+    rel->id = 0;
     return rel;
 }
-RelationPair *relPairCreator(){
+
+RelationPair *relPairCreator() {
     RelationPair *relPair = malloc(sizeof(Relation));
     relPair->first = malloc(1);
     relPair->second = malloc(1);
     return relPair;
 }
-void *setDestructor(Set *set){
-    if(set){
-      for(int i = 0; i < set->cardinality; i++){
-          free(set->items[i]);
-          if(set->items[i] != NULL) exit(EXIT_FAILURE);
-      }
-      free(set->items);
-      free(set);
-      if(set != NULL) exit(EXIT_FAILURE);
+
+void *setDestructor(Set *set) {
+    if (set) {
+        for (int i = 0; i < set->cardinality; i++) {
+            free(set->items[i]);
+            if (set->items[i] != NULL) exit(EXIT_FAILURE);
+        }
+        free(set->items);
+        free(set);
+        if (set != NULL) exit(EXIT_FAILURE);
     }
     return 0;
 }
-void setIncrement(Set *set, char *item){
+
+void setIncrement(Set *set, char *item) {
     ++(set->cardinality);
-    set->items = realloc(set->items, (set->cardinality) * sizeof(char*));
-    if(set->items == NULL) exit(EXIT_FAILURE);
+    set->items = realloc(set->items, (set->cardinality) * sizeof(char *));
+    if (set->items == NULL) exit(EXIT_FAILURE);
     *(set->items + (set->cardinality - 1)) = item;
 }
-void relIncrement(Relation *rel, RelationPair *tmpRelPair){
+
+void relIncrement(Relation *rel, RelationPair *tmpRelPair) {
     ++(rel->cardinality);
-    rel->items = realloc(rel->items, (rel->cardinality) * sizeof(char*));
-    if(rel->items == NULL) exit(EXIT_FAILURE);
+    rel->items = realloc(rel->items, (rel->cardinality) * sizeof(char *));
+    if (rel->items == NULL) exit(EXIT_FAILURE);
     *(rel->items + (rel->cardinality - 1)) = tmpRelPair;
 }
 
 void isReflexive(Relation *relation, Set *universum);
+
 void isSymmetric(Relation *relation);
+
 void isAntiSymmetric(Relation *relation);
+
 void isTransitive(Relation *relation);
+
 void isFunction(Relation *relation);
+
 void domain(Relation *relation);
+
 void codomain(Relation *relation);
+
 void isInjective(Relation *relation, Set *setA, Set *setB);
+
 void isSurjective(Relation *relation, Set *setA, Set *setB);
+
 void isBijective(Relation *relation, Set *setA, Set *setB);
 
-int main (int argc, char *argv[]) {
+bool containsRelationPair(Relation *relation, RelationPair relationPair);
+
+int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
         exit(EXIT_FAILURE);
@@ -125,8 +141,8 @@ int main (int argc, char *argv[]) {
         if (feof(file))break;
         if (lineChar == 2)continue;
         if (type == ' ') {
-            if (c != 'U' && c != 'C' && c != 'R' && c != 'S'){
-                printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum+1);
+            if (c != 'U' && c != 'C' && c != 'R' && c != 'S') {
+                printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum + 1);
                 exit(EXIT_FAILURE);
             }
             type = c;
@@ -136,15 +152,15 @@ int main (int argc, char *argv[]) {
         if (c == ' ' || c == '\n') {
             ++cardinality;
             sequence = 0;
-            if(type == 'U'){
+            if (type == 'U') {
                 setIncrement(universum, tmpStr);
             }
-            if(type == 'S') {
+            if (type == 'S') {
                 setIncrement(tmpSet, tmpStr);
             }
-            if(type == 'R'){
-                if(first){
-                    tmpRelPair = malloc(sizeof (tmpStr));
+            if (type == 'R') {
+                if (first) {
+                    tmpRelPair = malloc(sizeof(tmpStr));
                     tmpRelPair->first = tmpStr;
                     first = false;
                 }
@@ -155,40 +171,40 @@ int main (int argc, char *argv[]) {
                     tmpRelPair = NULL;
                 }
             }
-            if(type == 'C'){
-                if(command != NULL) {
+            if (type == 'C') {
+                if (command != NULL) {
                     cmdNum++;
-                    cmdArgs = realloc(cmdArgs, sizeof(char*));
-                    if(cmdArgs == NULL )exit(EXIT_FAILURE);
+                    cmdArgs = realloc(cmdArgs, sizeof(char *));
+                    if (cmdArgs == NULL)exit(EXIT_FAILURE);
                     *(cmdArgs + (cmdNum - 1)) = tmpStr;
                 }
-                if(command == NULL) command = tmpStr;
+                if (command == NULL) command = tmpStr;
             }
             tmpStr = NULL;
             if (c == '\n') {
                 lineNum++;
                 lineChar = 0;
                 cardinality = 0;
-                if(type == 'S'){
+                if (type == 'S') {
                     tmpSet->id = lineNum;
                     setArray.length++;
                     setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set *));
                     *(setArray.sets + (setArray.length - 1)) = tmpSet;
                     tmpSet = setCreator();
                 }
-                if(type == 'R'){
+                if (type == 'R') {
                     tmpRel->id = lineNum;
                     relArray.length++;
                     relArray.relations = realloc(relArray.relations, relArray.length * sizeof(Relation *));
                     *(relArray.relations + (relArray.length - 1)) = tmpRel;
                     tmpRel = relCreator();
                 }
-                if(type == 'C'){
-                    if(!strcmp(command, "minus")){
+                if (type == 'C') {
+                    if (!strcmp(command, "minus")) {
                         //volani na funkci
                     }
                     printf("Command: %s Args: ", command);
-                    for (int i = 0; i < cmdNum; i++){
+                    for (int i = 0; i < cmdNum; i++) {
                         printf(" %s ", cmdArgs[i]);
                     }
                     printf("\n");
@@ -201,12 +217,12 @@ int main (int argc, char *argv[]) {
             }
             continue;
         }
-        if(type == 'R'){
-            if(c == '('){
+        if (type == 'R') {
+            if (c == '(') {
                 first = true;
                 continue;
             }
-            if(c == ')') {
+            if (c == ')') {
                 second = true;
                 continue;
             }
@@ -229,7 +245,7 @@ int main (int argc, char *argv[]) {
         printf(")\n");
     }
 
-   // printf("\n");
+    // printf("\n");
     for (int i = 0; i < relArray.length; ++i) {
         printf("Rel %d ", relArray.relations[i]->id);
         for (int j = 0; j < relArray.relations[i]->cardinality; ++j) {
@@ -241,4 +257,93 @@ int main (int argc, char *argv[]) {
         }
         printf("\n");
     }
+
+    isReflexive(relArray.relations[0], universum);
 }
+
+void isReflexive(Relation *relation, Set *universum) {
+    bool result = true;
+    RelationPair tmpPair;
+    for (int i = 0; i < universum->cardinality; ++i) {
+        tmpPair.first = universum->items[i];
+        tmpPair.second = universum->items[i];
+        if (!containsRelationPair(relation, tmpPair)) {
+            result = false;
+        }
+    }
+    printf("%s", result ? "true" : "false");
+}
+
+void isSymmetric(Relation *relation) {
+    bool result = true;
+    RelationPair tmpPair;
+    for (int i = 0; i < relation->cardinality; ++i) {
+        tmpPair.first = relation->items[i]->second;
+        tmpPair.second = relation->items[i]->first;
+        if (strcmp(relation->items[i]->first, relation->items[i]->second) != 0) {
+            if (!containsRelationPair(relation, tmpPair)) {
+                result = false;
+                break;
+            }
+        }
+    }
+    printf("%s", result ? "true" : "false");
+}
+
+void isAntiSymmetric(Relation *relation) {
+    bool result = true;
+    RelationPair tmpPair;
+    for (int i = 0; i < relation->cardinality; ++i) {
+        tmpPair.first = relation->items[i]->second;
+        tmpPair.second = relation->items[i]->first;
+        if (strcmp(relation->items[i]->first, relation->items[i]->second) != 0) {
+            if (containsRelationPair(relation, tmpPair)) {
+                result = false;
+                break;
+            }
+        }
+    }
+    printf("%s", result ? "true" : "false");
+}
+
+
+void isTransitive(Relation *relation);
+
+void isFunction(Relation *relation){
+    bool result = true;
+
+    for (int i = 0; i < relation->cardinality; ++i) {
+        for (int j = 0; j < relation->cardinality; ++j) {
+            if (i == j) {
+                continue;
+            }
+
+            if (strcmp(relation->items[i]->first, relation->items[j]->first) == 0) {
+                result = false;
+                break;
+            }
+        }
+    }
+    printf("%s", result ? "true" : "false");
+}
+
+
+void domain(Relation *relation);
+
+void codomain(Relation *relation);
+
+void isInjective(Relation *relation, Set *setA, Set *setB);
+
+void isSurjective(Relation *relation, Set *setA, Set *setB);
+
+void isBijective(Relation *relation, Set *setA, Set *setB);
+
+bool containsRelationPair(Relation *relation, RelationPair relationPair) {
+    for (int i = 0; i < relation->cardinality; ++i) {
+        if (strcmp(relation->items[i]->first, relationPair.first) == 0 && strcmp(relation->items[i]->second, relationPair.second) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+};
