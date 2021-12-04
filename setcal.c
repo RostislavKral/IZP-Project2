@@ -100,7 +100,54 @@ void isBijective(Relation *relation, Set *setA, Set *setB);
 
 bool containsRelationPair(Relation *relation, RelationPair relationPair);
 
-int main(int argc, char *argv[]) {
+bool empty(Set *set) {
+    for (int j = 0; j < set->cardinality; ++j) {
+        printf("%s ", set->items[j]);
+        //printf("%s )", set->items[j]);
+    }
+    printf(" \n");
+}
+int card(Set *set) {
+    printf("noice\n");
+}
+int complement(Set *set) {
+    printf("noice\n");
+}
+void _union(Set *setA, Set *setB) {
+    printf("noice\n");
+}
+int intersect(Set *setA, Set *setB) {
+    printf("noice\n");
+}
+int minus(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+bool subseteq(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+bool subset(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+bool equals(Set *setA,Set *setB) {
+    printf("noice\n");
+}
+void *findRelation(RelationArray *relArray, int num){
+    for(int i = 0; i < relArray->length; i++){
+        if(relArray->relations[i]->id == num) {
+            return relArray->relations[i];
+        }
+    }
+  //  return NULL;
+}
+void *findSet(SetArray *setArray, int num){
+    for(int i = 0; i < setArray->length; i++){
+        if(setArray->sets[i]->id == num) {
+            return setArray->sets[i];
+        }
+    }
+    //return NULL;
+}
+int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
         exit(EXIT_FAILURE);
@@ -199,15 +246,38 @@ int main(int argc, char *argv[]) {
                     *(relArray.relations + (relArray.length - 1)) = tmpRel;
                     tmpRel = relCreator();
                 }
-                if (type == 'C') {
-                    if (!strcmp(command, "minus")) {
-                        //volani na funkci
-                    }
-                    printf("Command: %s Args: ", command);
-                    for (int i = 0; i < cmdNum; i++) {
+                if(type == 'C'){
+                    int firstArg = 0, secondArg = 0, thirdArg = 0;
+                    if(cmdArgs[0] != NULL) firstArg = atoi(cmdArgs[0]);
+                    if(cmdArgs[1] != NULL) secondArg = atoi(cmdArgs[1]);
+                    if(cmdArgs[2] != NULL) thirdArg = atoi(cmdArgs[2]);
+                    printf("Command: %s Args:", command);
+                    for (int i = 0; i < cmdNum; i++){
                         printf(" %s ", cmdArgs[i]);
                     }
                     printf("\n");
+                    //Relace
+                    if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
+                    if(strcmp(command, "symmetric") == 0){isSymmetric(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "antisymmetric") == 0){isAntiSymmetric(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "transitive") == 0){isTransitive(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "function") == 0){isFunction(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "domain") == 0){domain(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "codomain") == 0){codomain(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    if(strcmp(command, "bijective") == 0){isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    //Mnoziny
+                    if(strcmp(command, "empty") == 0){empty(findSet(&setArray,firstArg));}
+                    if(strcmp(command, "card") == 0){card(findSet(&setArray,firstArg));}
+                    if(strcmp(command, "complement") == 0){complement(findSet(&setArray,firstArg));}
+                    if(strcmp(command, "union") == 0){_union(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "intersect") == 0){intersect(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "minus") == 0){minus(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "subseteq") == 0){subseteq(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "subset") == 0){subset(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    if(strcmp(command, "equals") == 0){equals(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
+                    //reset
                     command = NULL;
                     cmdNum = 0;
                     cmdArgs = NULL;
@@ -307,7 +377,7 @@ void isAntiSymmetric(Relation *relation) {
 }
 
 
-void isTransitive(Relation *relation);
+void isTransitive(Relation *relation) {}
 
 void isFunction(Relation *relation){
     bool result = true;
@@ -328,15 +398,15 @@ void isFunction(Relation *relation){
 }
 
 
-void domain(Relation *relation);
+void domain(Relation *relation) {}
 
-void codomain(Relation *relation);
+void codomain(Relation *relation) {}
 
-void isInjective(Relation *relation, Set *setA, Set *setB);
+void isInjective(Relation *relation, Set *setA, Set *setB) {}
 
-void isSurjective(Relation *relation, Set *setA, Set *setB);
+void isSurjective(Relation *relation, Set *setA, Set *setB) {}
 
-void isBijective(Relation *relation, Set *setA, Set *setB);
+void isBijective(Relation *relation, Set *setA, Set *setB) {}
 
 bool containsRelationPair(Relation *relation, RelationPair relationPair) {
     for (int i = 0; i < relation->cardinality; ++i) {
