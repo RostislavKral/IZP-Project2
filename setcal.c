@@ -19,11 +19,11 @@ typedef struct {
     char *second;
 } RelationPair;
 typedef struct {
+    int id;
     int cardinality;
     RelationPair **items;
 } Relation;
 typedef struct {
-    int id;
     int length;
     Relation **relations;
 }RelationArray;
@@ -34,6 +34,19 @@ Set *setCreator(){
     set->cardinality = 0;
     set->items = malloc(1);
     return set;
+}
+Relation *relCreator(){
+    Relation *rel = malloc(sizeof(Relation));
+    rel->items = malloc(1);
+    rel->cardinality = 0;
+    rel->id =0;
+    return rel;
+}
+RelationPair *relPairCreator(){
+    RelationPair *relPair = malloc(sizeof(Relation));
+    relPair->first = malloc(1);
+    relPair->second = malloc(1);
+    return relPair;
 }
 void *setDestructor(Set *set){
     if(set){
@@ -52,6 +65,12 @@ void setIncrement(Set *set, char *item){
     set->items = realloc(set->items, (set->cardinality) * sizeof(char*));
     if(set->items == NULL) exit(EXIT_FAILURE);
     *(set->items + (set->cardinality - 1)) = item;
+}
+void relIncrement(Relation *rel, RelationPair *tmpRelPair){
+    ++(rel->cardinality);
+    rel->items = realloc(rel->items, (rel->cardinality) * sizeof(char*));
+    if(rel->items == NULL) exit(EXIT_FAILURE);
+    *(rel->items + (rel->cardinality - 1)) = tmpRelPair;
 }
 int main (int argc, char *argv[]) {
     if (argc != 2) {
@@ -73,12 +92,18 @@ int main (int argc, char *argv[]) {
 
     Set *universum;
     Set *tmpSet;
+    Relation *tmpRel;
+    RelationPair *tmpRelPair;
     universum = setCreator();
     tmpSet = setCreator();
+    tmpRel = relCreator();
+    tmpRelPair = relPairCreator();
 
     char c, type = ' ';
     int cardinality = 0, sequence = 0, lineNum = 0, lineChar = 0;
     char *tmpStr = malloc(1);
+    char *tmpRelItem = NULL;
+    bool first = false, second = false;
 
     while (true) {
         c = fgetc(file);
@@ -95,10 +120,23 @@ int main (int argc, char *argv[]) {
 
             if(type == 'U'){
                 setIncrement(universum, tmpStr);
-            } else if(type == 'R') {
+            }
+            if(type == 'S') {
                 setIncrement(tmpSet, tmpStr);
-            } else {
-                setIncrement(tmpSet, tmpStr);
+            }
+            if(type == 'R'){
+                if(first){
+                    tmpRelItem = tmpStr;
+                    first = false;
+                }
+                if (second) {
+                    tmpRelPair->first = tmpRelItem;
+                    tmpRelPair->second = tmpStr;
+                    second = false;
+                    printf("%s \n", tmpRelPair->first);
+                    printf("%s \n", tmpRelPair->second);
+                    relIncrement(tmpRel, tmpRelPair);
+                }
             }
             tmpStr = NULL;
             if (c == '\n') {
@@ -110,15 +148,28 @@ int main (int argc, char *argv[]) {
                     setArray.length++;
                     setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set *));
                     *(setArray.sets + (setArray.length - 1)) = tmpSet;
+                    tmpSet = setCreator();
+                }
+                if(type == 'R'){
+                    tmpRel->id = lineNum;
+                    relArray.length++;
+                    relArray.relations = realloc(relArray.relations, relArray.length * sizeof(Relation *));
+                    *(relArray.relations + (relArray.length - 1)) = tmpRel;
+                    tmpRel = relCreator();
                 }
                 type = ' ';
-                tmpSet = setCreator();
             }
             continue;
         }
         if(type == 'R'){
-            if(c == '(') continue;
-            if(c == ')') continue;
+            if(c == '('){
+                first = true;
+                continue;
+            }
+            if(c == ')') {
+                second = true;
+                continue;
+            }
         }
         tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
         if (tmpStr == NULL) exit(EXIT_FAILURE);
@@ -136,5 +187,18 @@ int main (int argc, char *argv[]) {
             printf(" %s ", setArray.sets[i]->items[j]);
         }
         printf(")\n");
+    }
+
+   // printf("\n");
+    for (int i = 0; i < relArray.length; ++i) {
+        printf("Rel %d ", relArray.relations[i]->id);
+        for (int j = 0; j < relArray.relations[i]->cardinality; ++j) {
+            printf("( %s ", relArray.relations[i]->items[j]->first);
+            printf("%s )", relArray.relations[i]->items[j]->second);
+            /*for(int k = 0; j < relArray.relations; k++){
+                printf("%s", rel)
+            }*/
+        }
+        printf("\n");
     }
 }
