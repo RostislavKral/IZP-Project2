@@ -4,4 +4,4 @@ S xxxxxxx zzzzzzzzz uuuuuuuuuu
 R (rel1 rel2) (rel3 rel4) (rel5 rel6)
 R (uu aa) (dd cc) (qq hh)
 C reflexive 4
-C injective 4 2 3
+C empty 2

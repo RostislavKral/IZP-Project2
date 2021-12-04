@@ -73,17 +73,13 @@ void relIncrement(Relation *rel, RelationPair *tmpRelPair){
     *(rel->items + (rel->cardinality - 1)) = tmpRelPair;
 }
 
-void isReflexive(Relation *relation, Set *universum){
-    printf("noice\n");
-    for (int j = 0; j < relation->cardinality; ++j) {
-        printf("( %s ",relation->items[j]->first);
-        printf("%s )", relation->items[j]->second);
-    }
-    printf("\n");
 
-};
 bool empty(Set *set) {
-    printf("noice\n");
+    for (int j = 0; j < set->cardinality; ++j) {
+        printf("%s ", set->items[j]);
+        //printf("%s )", set->items[j]);
+    }
+    printf(" \n");
 }
 int card(Set *set) {
     printf("noice\n");
@@ -109,6 +105,13 @@ bool subset(Set *setA,Set *setB) {
 bool equals(Set *setA,Set *setB) {
     printf("noice\n");
 }
+void isReflexive(Relation *relation, Set *universum){
+    for (int j = 0; j < relation->cardinality; ++j) {
+        printf("( %s ",relation->items[j]->first);
+        printf("%s )", relation->items[j]->second);
+    }
+    printf("\n");
+};
 void isSymmetric(Relation *relation){
     printf("noice\n");
 };
@@ -256,6 +259,11 @@ int main (int argc, char *argv[]) {
                     if(cmdArgs[0] != NULL) firstArg = atoi(cmdArgs[0]);
                     if(cmdArgs[1] != NULL) secondArg = atoi(cmdArgs[1]);
                     if(cmdArgs[2] != NULL) thirdArg = atoi(cmdArgs[2]);
+                    printf("Command: %s Args:", command);
+                    for (int i = 0; i < cmdNum; i++){
+                        printf(" %s ", cmdArgs[i]);
+                    }
+                    printf("\n");
                     //Relace
                     if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
                     if(strcmp(command, "symmetric") == 0){isSymmetric(findRelation(&relArray,firstArg));}
@@ -277,12 +285,7 @@ int main (int argc, char *argv[]) {
                     if(strcmp(command, "subseteq") == 0){subseteq(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
                     if(strcmp(command, "subset") == 0){subset(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
                     if(strcmp(command, "equals") == 0){equals(findSet(&setArray,firstArg),findSet(&setArray, secondArg));}
-
-                    printf("Command: %s Args:", command);
-                    for (int i = 0; i < cmdNum; i++){
-                        printf(" %s ", cmdArgs[i]);
-                    }
-                    printf("\n");
+                    //reset
                     command = NULL;
                     cmdNum = 0;
                     cmdArgs = NULL;
