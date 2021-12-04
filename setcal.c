@@ -73,17 +73,58 @@ void relIncrement(Relation *rel, RelationPair *tmpRelPair){
     *(rel->items + (rel->cardinality - 1)) = tmpRelPair;
 }
 
-void isReflexive(Relation *relation, Set *universum);
-void isSymmetric(Relation *relation);
-void isAntiSymmetric(Relation *relation);
-void isTransitive(Relation *relation);
-void isFunction(Relation *relation);
-void domain(Relation *relation);
-void codomain(Relation *relation);
-void isInjective(Relation *relation, Set *setA, Set *setB);
-void isSurjective(Relation *relation, Set *setA, Set *setB);
-void isBijective(Relation *relation, Set *setA, Set *setB);
+void isReflexive(Relation *relation, Set *universum){
+    printf("noice\n");
+    for (int j = 0; j < relation->cardinality; ++j) {
+        printf("( %s ",relation->items[j]->first);
+        printf("%s )", relation->items[j]->second);
+    }
+    printf("\n");
 
+};
+void isSymmetric(Relation *relation){
+    printf("noice\n");
+};
+void isAntiSymmetric(Relation *relation){
+    printf("noice\n");
+};
+void isTransitive(Relation *relation){
+    printf("noice\n");
+};
+void isFunction(Relation *relation){
+    printf("noice\n");
+};
+void domain(Relation *relation){
+    printf("noice\n");
+};
+void codomain(Relation *relation){
+    printf("noice\n");
+};
+void isInjective(Relation *relation, Set *setA, Set *setB){
+    printf("noice\n");
+};
+void isSurjective(Relation *relation, Set *setA, Set *setB){
+    printf("noice\n");
+};
+void isBijective(Relation *relation, Set *setA, Set *setB){
+    printf("noice\n");
+};
+void *findRelation(RelationArray *relArray, int num){
+    for(int i = 0; i < relArray->length; i++){
+        if(relArray->relations[i]->id == num) {
+            return relArray->relations[i];
+        }
+    }
+  //  return NULL;
+}
+void *findSet(SetArray *setArray, int num){
+    for(int i = 0; i < setArray->length; i++){
+        if(setArray->sets[i]->id == num) {
+            return setArray->sets[i];
+        }
+    }
+    //return NULL;
+}
 int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
@@ -184,10 +225,21 @@ int main (int argc, char *argv[]) {
                     tmpRel = relCreator();
                 }
                 if(type == 'C'){
-                    if(!strcmp(command, "minus")){
-                        //volani na funkci
-                    }
-                    printf("Command: %s Args: ", command);
+                    int firstArg = 0, secondArg = 0, thirdArg = 0;
+                    if(cmdArgs[0] != NULL) firstArg = atoi(cmdArgs[0]);
+                    if(cmdArgs[1] != NULL) secondArg = atoi(cmdArgs[1]);
+                    if(cmdArgs[2] != NULL) thirdArg = atoi(cmdArgs[2]);
+                    if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
+                    if(strcmp(command, "symmetric") == 0){isSymmetric(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "antisymmetric") == 0){isAntiSymmetric(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "transitive") == 0){isTransitive(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "function") == 0){isFunction(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "domain") == 0){domain(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "codomain") == 0){codomain(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    if(strcmp(command, "bijective") == 0){isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    printf("Command: %s Args:", command);
                     for (int i = 0; i < cmdNum; i++){
                         printf(" %s ", cmdArgs[i]);
                     }
