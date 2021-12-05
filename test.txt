@@ -2,6 +2,6 @@ U a b c
 S b
 S a b
 S a c b
-R (b a) (a b)
+R (b a) (a c)
 R (a a) (b b) (c a) (a b)
 C bijective 5 3 3
