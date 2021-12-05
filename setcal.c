@@ -49,31 +49,35 @@ RelationPair *relPairCreator() {
     relPair->second = NULL;
     return relPair;
 }
+
 void setDestructor(Set *set) {
     free(set->items);
     free(set);
     //if(set != NULL) exit(EXIT_FAILURE);
 }
-void relPairDestructor(RelationPair *relationPair){
+
+void relPairDestructor(RelationPair *relationPair) {
     free(relationPair->first);
     free(relationPair->second);
     free(relationPair);
     //if(relationPair != NULL) exit(EXIT_FAILURE);
 }
-void relDestructor(Relation *relation){
+
+void relDestructor(Relation *relation) {
     free(relation->items);
     free(relation);
     //if(relation != NULL) exit(EXIT_FAILURE);
 }
+
 void setIncrement(Set *set, char *item) {
     ++(set->cardinality);
     //char **ptr = NULL;
-    set->items= realloc(set->items, (set->cardinality) * sizeof(char *));
+    set->items = realloc(set->items, (set->cardinality) * sizeof(char *));
     //set->items = ptr;
-    printf("test: %p \n", item);
+    //printf("test: %p \n", item);
     *(set->items + (set->cardinality - 1)) = item;
     for (int i = 0; i < set->cardinality; ++i) {
-        printf("test: %p   ", set->items[i]);
+        //   printf("test: %p   ", set->items[i]);
     }
 }
 
@@ -117,36 +121,29 @@ void printSet(Set *set) {
         }
     }
 
-    printf("\n");
+    printf("\n\n");
 }
 
-bool empty(Set *set) {
+bool empty(Set *set, bool print) {
     bool result = set->cardinality == 0 ? true : false;
-    printf("%d", set->cardinality);
-    printf("%s\n", result ? "true" : "false");
+    print ? printf("%s\n", result ? "true" : "false"):0;
     return result;
 }
 
 void card(Set *set) {
+    if (empty(set, false)) printf("0\n");
     printf("%d\n", set->cardinality);
 }
 
 void complement(Set *set, Set *universum) {
     Set *complementSet = setCreator();
-    for (int i = 0; i < set->cardinality; ++i) {
-        setIncrement(complementSet, set->items[i]);
-    }
 
-    printSet(complementSet);
     int control;
     char *tmp;
     for (int i = 0; i < universum->cardinality; ++i) {
         control = 0;
         tmp = NULL;
         for (int j = 0; j < set->cardinality; ++j) {
-            printf("Prvek mnoziny: %s\n", set->items[j]);
-            printf("Prvek univerza: %s\n", universum->items[i]);
-            printf("STRCMP: %d\n", strcmp(set->items[j], universum->items[i]));
             if (strcmp(set->items[j], universum->items[i]) == 0) {
                 control = 1;
                 break;
@@ -167,17 +164,12 @@ void _union(Set *setA, Set *setB) {
     for (int i = 0; i < setA->cardinality; ++i) {
         setIncrement(unionSet, setA->items[i]);
     }
-    printf("sad");
-    printSet(unionSet);
     int control;
     char *tmp;
     for (int i = 0; i < setB->cardinality; ++i) {
         control = 0;
         tmp = NULL;
         for (int j = 0; j < setA->cardinality; ++j) {
-            printf("Prvek mnoziny: %s\n", setA->items[j]);
-            printf("Prvek univerza: %s\n", setB->items[i]);
-            printf("STRCMP: %d\n", strcmp(setA->items[j], setB->items[i]));
             if (strcmp(setA->items[j], setB->items[i]) == 0) {
                 control = 1;
                 break;
@@ -195,19 +187,12 @@ void _union(Set *setA, Set *setB) {
 
 void intersect(Set *setA, Set *setB) {
     Set *intersectSet = setCreator();
-    /* for (int i = 0; i < setA->cardinality; ++i) {
-         setIncrement(intersectSet, setA->items[i]);
-     }*/
-    printSet(intersectSet);
     int control;
     char *tmp;
     for (int i = 0; i < setB->cardinality; ++i) {
         control = 0;
         tmp = NULL;
         for (int j = 0; j < setA->cardinality; ++j) {
-            printf("Prvek mnoziny: %s\n", setA->items[j]);
-            printf("Prvek univerza: %s\n", setB->items[i]);
-            printf("STRCMP: %d\n", strcmp(setA->items[j], setB->items[i]));
             if (strcmp(setA->items[j], setB->items[i]) == 0) {
                 control = 1;
                 tmp = setB->items[i];
@@ -225,27 +210,18 @@ void intersect(Set *setA, Set *setB) {
 
 int minus(Set *setA, Set *setB) {
     Set *minusSet = setCreator();
-    /* for (int i = 0; i < setA->cardinality; ++i) {
-         setIncrement(intersectSet, setA->items[i]);
-     }*/
-    printSet(minusSet);
     int control;
     char *tmp;
     for (int i = 0; i < setA->cardinality; ++i) {
         control = 0;
         tmp = NULL;
         for (int j = 0; j < setB->cardinality; ++j) {
-            printf("Prvek mnoziny: %s\n", setB->items[j]);
-            printf("Prvek univerza: %s\n", setA->items[i]);
-            printf("STRCMP: %d\n", strcmp(setB->items[j], setA->items[i]));
             if (strcmp(setB->items[j], setA->items[i]) == 0) {
                 control = 1;
                 break;
             }
             tmp = setA->items[i];
-
         }
-
         if (control != 1) {
             setIncrement(minusSet, tmp);
         }
@@ -275,7 +251,6 @@ bool subseteq(Set *setA, Set *setB, bool print) {
     return true;
 
 }
-
 
 bool equals(Set *setA, Set *setB, bool print) {
     if (setA->cardinality != setB->cardinality) {
@@ -319,7 +294,6 @@ void *findRelation(RelationArray *relArray, int num) {
             return relArray->relations[i];
         }
     }
-    //  return NULL;
 }
 
 void *findSet(SetArray *setArray, int num) {
@@ -328,7 +302,6 @@ void *findSet(SetArray *setArray, int num) {
             return setArray->sets[i];
         }
     }
-    //return NULL;
 }
 
 bool setContains(Set *set, char *item) {
@@ -340,7 +313,8 @@ bool setContains(Set *set, char *item) {
 
     return false;
 }
-int main (int argc, char *argv[]) {
+
+int main(int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
         exit(EXIT_FAILURE);
@@ -371,21 +345,18 @@ int main (int argc, char *argv[]) {
     int cardinality = 0, sequence = 0, lineNum = 0, lineChar = 0;
     char *tmpStr = NULL;
     char *tmpRelItem = NULL;
-    bool first = false, second = false;
-    bool emptyS = false;
+    bool first = false, second = false, emptyS = false;
     char *command = NULL;
     char **cmdArgs = NULL;
     int cmdNum = 0;
     while (true) {
         c = fgetc(file);
         lineChar++;
-        //printf("C: %d \n", c);
-        if (lineChar == 2){
-            if(type == 'S' && c == 10){
+        if (lineChar == 2) {
+            if (type == 'S' && c == 10) {
                 tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
                 if (tmpStr == NULL)
                     exit(EXIT_FAILURE);
-                sequence = 0;
                 *(tmpStr + sequence) = 'E';
                 ++sequence;
                 emptyS = true;
@@ -396,7 +367,7 @@ int main (int argc, char *argv[]) {
             //continue;
         }
         if (type == ' ') {
-            if(c == -1) break;
+            if (c == -1) break;
             if (c != 'U' && c != 'C' && c != 'R' && c != 'S') {
                 printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum + 1);
                 exit(EXIT_FAILURE);
@@ -411,8 +382,8 @@ int main (int argc, char *argv[]) {
                 setIncrement(universum, tmpStr);
             }
             if (type == 'S') {
-                if(emptyS) tmpSet->cardinality = -1;
                 setIncrement(tmpSet, tmpStr);
+                if (emptyS == true) tmpSet->cardinality = 0;
             }
             if (type == 'R') {
                 if (first) {
@@ -442,9 +413,7 @@ int main (int argc, char *argv[]) {
                 lineNum++;
                 lineChar = 0;
                 cardinality = 0;
-                emptyS = false;
                 if (type == 'S') {
-                    //printf("kokokokook %d\n", lineNum);
                     tmpSet->id = lineNum;
                     setArray.length++;
                     setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set *));
@@ -474,33 +443,41 @@ int main (int argc, char *argv[]) {
                     printf("args: %d %d %d \n", firstArg, secondArg, thirdArg);
                     printf("\n");
                     //Relace
-                    if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
-                    if(strcmp(command, "symmetric") == 0){isSymmetric(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "antisymmetric") == 0){isAntiSymmetric(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "transitive") == 0){isTransitive(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "function") == 0){isFunction(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "domain") == 0){domain(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "codomain") == 0){codomain(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "injective") == 0){
+                    if (strcmp(command, "reflexive") == 0) {
+                        isReflexive(findRelation(&relArray, firstArg), universum);
+                    }
+                    if (strcmp(command, "symmetric") == 0) { isSymmetric(findRelation(&relArray, firstArg)); }
+                    if (strcmp(command, "antisymmetric") == 0) { isAntiSymmetric(findRelation(&relArray, firstArg)); }
+                    if (strcmp(command, "transitive") == 0) { isTransitive(findRelation(&relArray, firstArg)); }
+                    if (strcmp(command, "function") == 0) { isFunction(findRelation(&relArray, firstArg)); }
+                    if (strcmp(command, "domain") == 0) { domain(findRelation(&relArray, firstArg)); }
+                    if (strcmp(command, "codomain") == 0) { codomain(findRelation(&relArray, firstArg)); }
+                    if (strcmp(command, "injective") == 0) {
                         if (secondArg == 0 || thirdArg == 0) {
                             printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
                             exit(EXIT_FAILURE);
                         }
-                        isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
-                    if(strcmp(command, "surjective") == 0){
+                        isInjective(findRelation(&relArray, firstArg), findSet(&setArray, secondArg),
+                                    findSet(&setArray, thirdArg), true);
+                    }
+                    if (strcmp(command, "surjective") == 0) {
                         if (secondArg == 0 || thirdArg == 0) {
                             printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
                             exit(EXIT_FAILURE);
                         }
-                        isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
-                    if(strcmp(command, "bijective") == 0){
+                        isSurjective(findRelation(&relArray, firstArg), findSet(&setArray, secondArg),
+                                     findSet(&setArray, thirdArg), true);
+                    }
+                    if (strcmp(command, "bijective") == 0) {
                         if (secondArg == 0 || thirdArg == 0) {
                             printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
                             exit(EXIT_FAILURE);
                         }
-                        isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                        isBijective(findRelation(&relArray, firstArg), findSet(&setArray, secondArg),
+                                    findSet(&setArray, thirdArg));
+                    }
                     //Mnoziny
-                    if (strcmp(command, "empty") == 0) { empty(findSet(&setArray, firstArg)); }
+                    if (strcmp(command, "empty") == 0) { empty(findSet(&setArray, firstArg), true); }
                     if (strcmp(command, "card") == 0) { card(findSet(&setArray, firstArg)); }
                     if (strcmp(command, "complement") == 0) { complement(findSet(&setArray, firstArg), universum); }
                     if (strcmp(command, "union") == 0) {
@@ -528,7 +505,7 @@ int main (int argc, char *argv[]) {
                 }
                 type = ' ';
                 //command = NULL;
-                if(c == -1){
+                if (c == -1) {
                     if (feof(file))break;
                     break;
                 }
@@ -575,10 +552,7 @@ int main (int argc, char *argv[]) {
         printf("\n");
     }
 
-    //codomain(relArray.relations[0]);
     //Memory dealoc
-
-
     for (int i = 0; i < relArray.length; ++i) {
         for (int j = 0; j < relArray.relations[i]->cardinality; ++j) {
             free(relArray.relations[i]->items[j]->first);
@@ -589,22 +563,20 @@ int main (int argc, char *argv[]) {
         free(relArray.relations[i]);
     }
     free(relArray.relations);
-    for(int i = 0; i < setArray.length; i++){
+    for (int i = 0; i < setArray.length; i++) {
         for (int j = 0; j < setArray.sets[i]->cardinality; ++j) {
             free(setArray.sets[i]->items[j]);
         }
         setDestructor(setArray.sets[i]);
     }
-    for(int i = 0; i < universum->cardinality; i++){
+    for (int i = 0; i < universum->cardinality; i++) {
         free(universum->items[i]);
     }
-    setDestructor(tmpSet);
-    free(tmpSet->items);
     free(setArray.sets);
-    //free(tmpSet);
 
-   // relPairDestructor(tmpRelPair);
+    setDestructor(tmpSet);
     relDestructor(tmpRel);
+    free(tmpRel->items);
     setDestructor(universum);
     free(tmpRelPair);
     free(tmpStr);
@@ -743,9 +715,6 @@ bool isInjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
         if (!setContains(codomain, relation->items[i]->second)) {
             unsigned long int length = strlen(relation->items[i]->second);
             char *newStr = malloc(length * sizeof(char));
-            /*for (int j = 0; j < length; j++) {
-                *(newStr + j) = relation->items[i]->second[j];
-            } */
             strcpy(newStr, relation->items[i]->second);
             setIncrement(codomain, newStr);
             newStr = NULL;
@@ -779,10 +748,7 @@ bool isSurjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
             }
             setIncrement(codomain, newStr);
             newStr = NULL;
-        } /* else {
-            result = false;
-            break;
-        } */
+        }
     }
 
     result = setB->cardinality == codomain->cardinality;
