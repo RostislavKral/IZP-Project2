@@ -338,18 +338,6 @@ bool setContains(Set *set, char *item) {
     return false;
 }
 
-void printSet(Set *set) {
-    printf("S ");
-    for (int i = 0; i < set->cardinality; ++i) {
-        printf("%s", set->items[i]);
-
-        if (i != set->cardinality - 1) {
-            printf(" ");
-        }
-    }
-
-    printf("\n");
-}
 //void exitProgram()
 int main (int argc, char *argv[]) {
     if (argc != 2) {
@@ -472,6 +460,11 @@ int main (int argc, char *argv[]) {
                     for (int i = 0; i < cmdNum; i++) {
                         printf(" %s ", cmdArgs[i]);
                     }
+                    if (firstArg == 0) {
+                        printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
+                        exit(EXIT_FAILURE);
+                    }
+                    printf("args: %d %d %d \n", firstArg, secondArg, thirdArg);
                     printf("\n");
                     //Relace
                     if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
@@ -481,9 +474,24 @@ int main (int argc, char *argv[]) {
                     if(strcmp(command, "function") == 0){isFunction(findRelation(&relArray,firstArg));}
                     if(strcmp(command, "domain") == 0){domain(findRelation(&relArray,firstArg));}
                     if(strcmp(command, "codomain") == 0){codomain(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
-                    if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
-                    if(strcmp(command, "bijective") == 0){isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    if(strcmp(command, "injective") == 0){
+                        if (secondArg == 0 || thirdArg == 0) {
+                            printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
+                            exit(EXIT_FAILURE);
+                        }
+                        isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
+                    if(strcmp(command, "surjective") == 0){
+                        if (secondArg == 0 || thirdArg == 0) {
+                            printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
+                            exit(EXIT_FAILURE);
+                        }
+                        isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
+                    if(strcmp(command, "bijective") == 0){
+                        if (secondArg == 0 || thirdArg == 0) {
+                            printf("Missing argument in file %s on line %d \n", argv[1], lineNum);
+                            exit(EXIT_FAILURE);
+                        }
+                        isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
                     //Mnoziny
                     if (strcmp(command, "empty") == 0) { empty(findSet(&setArray, firstArg)); }
                     if (strcmp(command, "card") == 0) { card(findSet(&setArray, firstArg)); }
@@ -560,7 +568,7 @@ int main (int argc, char *argv[]) {
         printf("\n");
     }
 
-    codomain(relArray.relations[0]);
+    //codomain(relArray.relations[0]);
     //Memory dealoc
     setDestructor(universum);
     setDestructor(tmpSet);
@@ -715,9 +723,10 @@ bool isInjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
         if (!setContains(codomain, relation->items[i]->second)) {
             unsigned long int length = strlen(relation->items[i]->second);
             char *newStr = malloc(length * sizeof(char));
-            for (int j = 0; j < length; j++) {
+            /*for (int j = 0; j < length; j++) {
                 *(newStr + j) = relation->items[i]->second[j];
-            }
+            } */
+            strcpy(newStr, relation->items[i]->second);
             setIncrement(codomain, newStr);
             newStr = NULL;
         } else {
