@@ -391,7 +391,7 @@ int main(int argc, char *argv[]) {
             }
             if (type == 'S') {
                 setIncrement(tmpSet, tmpStr);
-                if (emptyS == true) tmpSet->cardinality = 0;
+              //  if (emptyS == true) tmpSet->cardinality = 0;
             }
             if (type == 'R') {
                 if (first) {
