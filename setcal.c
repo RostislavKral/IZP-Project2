@@ -372,6 +372,7 @@ int main (int argc, char *argv[]) {
     char *tmpStr = NULL;
     char *tmpRelItem = NULL;
     bool first = false, second = false;
+    bool emptyS = false;
     char *command = NULL;
     char **cmdArgs = NULL;
     int cmdNum = 0;
@@ -384,8 +385,10 @@ int main (int argc, char *argv[]) {
                 tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
                 if (tmpStr == NULL)
                     exit(EXIT_FAILURE);
-                *(tmpStr + sequence) = 0;
+                sequence = 0;
+                *(tmpStr + sequence) = 'E';
                 ++sequence;
+                emptyS = true;
                 c = '\n';
             } else {
                 continue;
@@ -408,6 +411,7 @@ int main (int argc, char *argv[]) {
                 setIncrement(universum, tmpStr);
             }
             if (type == 'S') {
+                if(emptyS) tmpSet->cardinality = -1;
                 setIncrement(tmpSet, tmpStr);
             }
             if (type == 'R') {
@@ -438,6 +442,7 @@ int main (int argc, char *argv[]) {
                 lineNum++;
                 lineChar = 0;
                 cardinality = 0;
+                emptyS = false;
                 if (type == 'S') {
                     //printf("kokokokook %d\n", lineNum);
                     tmpSet->id = lineNum;
@@ -593,11 +598,13 @@ int main (int argc, char *argv[]) {
     for(int i = 0; i < universum->cardinality; i++){
         free(universum->items[i]);
     }
-    free(setArray.sets);
-
     setDestructor(tmpSet);
+    free(tmpSet->items);
+    free(setArray.sets);
+    //free(tmpSet);
+
+   // relPairDestructor(tmpRelPair);
     relDestructor(tmpRel);
-    free(tmpRel->items);
     setDestructor(universum);
     free(tmpRelPair);
     free(tmpStr);
