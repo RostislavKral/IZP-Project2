@@ -112,48 +112,58 @@ bool empty(Set *set) {
     }
     printf(" \n");
 }
+
 int card(Set *set) {
     printf("noice\n");
 }
+
 int complement(Set *set) {
     printf("noice\n");
 }
+
 void _union(Set *setA, Set *setB) {
     printf("noice\n");
 }
+
 int intersect(Set *setA, Set *setB) {
     printf("noice\n");
 }
-int minus(Set *setA,Set *setB) {
+
+int minus(Set *setA, Set *setB) {
     printf("noice\n");
 }
-bool subseteq(Set *setA,Set *setB) {
+
+bool subseteq(Set *setA, Set *setB) {
     printf("noice\n");
 }
-bool subset(Set *setA,Set *setB) {
+
+bool subset(Set *setA, Set *setB) {
     printf("noice\n");
 }
-bool equals(Set *setA,Set *setB) {
+
+bool equals(Set *setA, Set *setB) {
     printf("noice\n");
 }
-void *findRelation(RelationArray *relArray, int num){
-    for(int i = 0; i < relArray->length; i++){
-        if(relArray->relations[i]->id == num) {
+
+void *findRelation(RelationArray *relArray, int num) {
+    for (int i = 0; i < relArray->length; i++) {
+        if (relArray->relations[i]->id == num) {
             return relArray->relations[i];
         }
     }
-  //  return NULL;
+    //  return NULL;
 }
-void *findSet(SetArray *setArray, int num){
-    for(int i = 0; i < setArray->length; i++){
-        if(setArray->sets[i]->id == num) {
+
+void *findSet(SetArray *setArray, int num) {
+    for (int i = 0; i < setArray->length; i++) {
+        if (setArray->sets[i]->id == num) {
             return setArray->sets[i];
         }
     }
     //return NULL;
 }
 
-bool setContains (Set *set, char *item) {
+bool setContains(Set *set, char *item) {
     for (int i = 0; i < set->cardinality; ++i) {
         if (strcmp(set->items[i], item) == 0) {
             return true;
@@ -288,13 +298,13 @@ int main (int argc, char *argv[]) {
                     *(relArray.relations + (relArray.length - 1)) = tmpRel;
                     tmpRel = relCreator();
                 }
-                if(type == 'C'){
+                if (type == 'C') {
                     int firstArg = 0, secondArg = 0, thirdArg = 0;
-                    if(cmdArgs[0] != NULL) firstArg = atoi(cmdArgs[0]);
-                    if(cmdArgs[1] != NULL) secondArg = atoi(cmdArgs[1]);
-                    if(cmdArgs[2] != NULL) thirdArg = atoi(cmdArgs[2]);
+                    if (cmdArgs[0] != NULL) firstArg = atoi(cmdArgs[0]);
+                    if (cmdArgs[1] != NULL) secondArg = atoi(cmdArgs[1]);
+                    if (cmdArgs[2] != NULL) thirdArg = atoi(cmdArgs[2]);
                     printf("Command: %s Args:", command);
-                    for (int i = 0; i < cmdNum; i++){
+                    for (int i = 0; i < cmdNum; i++) {
                         printf(" %s ", cmdArgs[i]);
                     }
                     printf("\n");
@@ -462,7 +472,7 @@ void isTransitive(Relation *relation) {
     printf("%s\n", result ? "true" : "false");
 }
 
-void isFunction(Relation *relation){
+void isFunction(Relation *relation) {
     bool result = true;
 
     for (int i = 0; i < relation->cardinality; ++i) {
@@ -485,7 +495,13 @@ void domain(Relation *relation) {
 
     for (int i = 0; i < relation->cardinality; ++i) {
         if (!setContains(domain, relation->items[i]->first)) {
-            setIncrement(domain, relation->items[i]->first);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->first[j];
+            }
+            setIncrement(domain, newStr);
+            newStr = NULL;
         }
     }
 
@@ -498,7 +514,13 @@ void codomain(Relation *relation) {
 
     for (int i = 0; i < relation->cardinality; ++i) {
         if (!setContains(codomain, relation->items[i]->second)) {
-            setIncrement(codomain, relation->items[i]->second);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->second[j];
+            }
+            setIncrement(codomain, newStr);
+            newStr = NULL;
         }
     }
 
@@ -514,7 +536,13 @@ bool isInjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
             continue;
         }
         if (!setContains(codomain, relation->items[i]->second)) {
-            setIncrement(codomain, relation->items[i]->second);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->second[j];
+            }
+            setIncrement(codomain, newStr);
+            newStr = NULL;
         } else {
             result = false;
             break;
@@ -538,7 +566,13 @@ bool isSurjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
         }
 
         if (!setContains(codomain, relation->items[i]->second)) {
-            setIncrement(codomain, relation->items[i]->second);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->second[j];
+            }
+            setIncrement(codomain, newStr);
+            newStr = NULL;
         } /* else {
             result = false;
             break;
@@ -547,7 +581,7 @@ bool isSurjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
 
     result = setB->cardinality == codomain->cardinality;
     setDestructor(codomain);
-    if (printResult){
+    if (printResult) {
         printf("%s\n", result ? "true" : "false");
     }
     return result;
@@ -566,7 +600,8 @@ void isBijective(Relation *relation, Set *setA, Set *setB) {
 
 bool containsRelationPair(Relation *relation, RelationPair relationPair) {
     for (int i = 0; i < relation->cardinality; ++i) {
-        if (strcmp(relation->items[i]->first, relationPair.first) == 0 && strcmp(relation->items[i]->second, relationPair.second) == 0) {
+        if (strcmp(relation->items[i]->first, relationPair.first) == 0 &&
+            strcmp(relation->items[i]->second, relationPair.second) == 0) {
             return true;
         }
     }
