@@ -65,14 +65,16 @@ void relDestructor(Relation *relation){
     free(relation);
     //if(relation != NULL) exit(EXIT_FAILURE);
 }
-
-
 void setIncrement(Set *set, char *item) {
     ++(set->cardinality);
-    set->items = realloc(set->items, (set->cardinality) * sizeof(char *));
-    if (set->items == NULL)
-        exit(EXIT_FAILURE);
+    //char **ptr = NULL;
+    set->items= realloc(set->items, (set->cardinality) * sizeof(char *));
+    //set->items = ptr;
+    printf("test: %p \n", item);
     *(set->items + (set->cardinality - 1)) = item;
+    for (int i = 0; i < set->cardinality; ++i) {
+        printf("test: %p   ", set->items[i]);
+    }
 }
 
 void relIncrement(Relation *rel, RelationPair *tmpRelPair) {
@@ -215,7 +217,7 @@ int main (int argc, char *argv[]) {
 
     char c, type = ' ';
     int cardinality = 0, sequence = 0, lineNum = 0, lineChar = 0;
-    char *tmpStr = malloc(1);
+    char *tmpStr = NULL;
     char *tmpRelItem = NULL;
     bool first = false, second = false;
     char *command = NULL;
@@ -239,6 +241,7 @@ int main (int argc, char *argv[]) {
             //continue;
         }
         if (type == ' ') {
+            if(c == -1) break;
             if (c != 'U' && c != 'C' && c != 'R' && c != 'S') {
                 printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum + 1);
                 exit(EXIT_FAILURE);
@@ -383,27 +386,38 @@ int main (int argc, char *argv[]) {
         printf("\n");
     }
 
-    codomain(relArray.relations[0]);
+    //codomain(relArray.relations[0]);
     //Memory dealoc
-    setDestructor(universum);
-    setDestructor(tmpSet);
-    //relDestructor(tmpRel);
-   // relPairDestructor(tmpRelPair);
-    for(int i = 0; i < relArray.length; i++){
-        for(int j = 0; j < relArray.relations[i]->cardinality; j++){
-            relPairDestructor(relArray.relations[i]->items[j]);
+
+
+    for (int i = 0; i < relArray.length; ++i) {
+        for (int j = 0; j < relArray.relations[i]->cardinality; ++j) {
+            free(relArray.relations[i]->items[j]->first);
+            free(relArray.relations[i]->items[j]->second);
+            free(relArray.relations[i]->items[j]);
         }
-        relDestructor(relArray.relations[i]);
-        //relArray.relations[i];
+        free(relArray.relations[i]->items);
+        free(relArray.relations[i]);
     }
+    free(relArray.relations);
     for(int i = 0; i < setArray.length; i++){
+        for (int j = 0; j < setArray.sets[i]->cardinality; ++j) {
+            free(setArray.sets[i]->items[j]);
+        }
         setDestructor(setArray.sets[i]);
     }
-    free(tmpStr);
-    free(cmdArgs);
-    free(relArray.relations);
+    for(int i = 0; i < universum->cardinality; i++){
+        free(universum->items[i]);
+    }
     free(setArray.sets);
 
+    setDestructor(tmpSet);
+    relDestructor(tmpRel);
+    free(tmpRel->items);
+    setDestructor(universum);
+    free(tmpRelPair);
+    free(tmpStr);
+    free(cmdArgs);
 }
 
 

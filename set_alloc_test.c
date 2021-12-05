@@ -34,7 +34,7 @@ void set_add(Set *set, char *item){
 }
 int main(int argc, char **argv) {
 
-    FILE *file = fopen("../test.txt", "r");
+    FILE *file = fopen(argv[1], "r");
 
     // printf("%d\n", sizeof(Set));
     int sequence = 0;
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
     for (int i = 0; i < setArray.length; ++i) {
         printf("set (");
         for (int j = 0; j < setArray.sets[i]->cardinality; ++j) {
-            printf("%s ", setArray.sets[i]->items[j]);
+            printf(" %s ", setArray.sets[i]->items[j]);
         }
         printf(")\n");
     }
