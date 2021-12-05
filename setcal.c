@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include <ctype.h>
 
 typedef struct {
     int id;
@@ -32,13 +31,13 @@ Set *setCreator() {
     Set *set = malloc(sizeof(Set));
     set->id = 0;
     set->cardinality = 0;
-    set->items = malloc(1);
+    set->items = NULL;
     return set;
 }
 
 Relation *relCreator() {
     Relation *rel = malloc(sizeof(Relation));
-    rel->items = malloc(1);
+    rel->items = NULL;
     rel->cardinality = 0;
     rel->id = 0;
     return rel;
@@ -46,28 +45,27 @@ Relation *relCreator() {
 
 RelationPair *relPairCreator() {
     RelationPair *relPair = malloc(sizeof(Relation));
-    relPair->first = malloc(1);
-    relPair->second = malloc(1);
+    relPair->first = NULL;
+    relPair->second = NULL;
     return relPair;
 }
-
 void setDestructor(Set *set) {
-    return;
-    if (set) {
-        for (int i = 0; i < set->cardinality; i++) {
-            // printf("++++ %p ++++", set->items[i]);
-            free(set->items[i]);
-            // printf("++++ %p ++++", set->items[i]);
-            if (set->items[i] != NULL)
-                exit(EXIT_FAILURE);
-        }
-        free(set->items);
-        free(set);
-        if (set != NULL)
-            exit(EXIT_FAILURE);
-    }
-    // return 0;
+    free(set->items);
+    free(set);
+    //if(set != NULL) exit(EXIT_FAILURE);
 }
+void relPairDestructor(RelationPair *relationPair){
+    free(relationPair->first);
+    free(relationPair->second);
+    free(relationPair);
+    //if(relationPair != NULL) exit(EXIT_FAILURE);
+}
+void relDestructor(Relation *relation){
+    free(relation->items);
+    free(relation);
+    //if(relation != NULL) exit(EXIT_FAILURE);
+}
+
 
 void setIncrement(Set *set, char *item) {
     ++(set->cardinality);
@@ -340,7 +338,20 @@ bool setContains(Set *set, char *item) {
     return false;
 }
 
-int main(int argc, char *argv[]) {
+void printSet(Set *set) {
+    printf("S ");
+    for (int i = 0; i < set->cardinality; ++i) {
+        printf("%s", set->items[i]);
+
+        if (i != set->cardinality - 1) {
+            printf(" ");
+        }
+    }
+
+    printf("\n");
+}
+//void exitProgram()
+int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
         exit(EXIT_FAILURE);
@@ -378,8 +389,20 @@ int main(int argc, char *argv[]) {
     while (true) {
         c = fgetc(file);
         lineChar++;
-        if (feof(file))break;
-        if (lineChar == 2)continue;
+        //printf("C: %d \n", c);
+        if (lineChar == 2){
+            if(type == 'S' && c == 10){
+                tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
+                if (tmpStr == NULL)
+                    exit(EXIT_FAILURE);
+                *(tmpStr + sequence) = 0;
+                ++sequence;
+                c = '\n';
+            } else {
+                continue;
+            }
+            //continue;
+        }
         if (type == ' ') {
             if (c != 'U' && c != 'C' && c != 'R' && c != 'S') {
                 printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum + 1);
@@ -388,8 +411,7 @@ int main(int argc, char *argv[]) {
             type = c;
             continue;
         }
-        // TODO: když není řádek ukončen \n tak se celý řádek nepropíše
-        if (c == ' ' || c == '\n') {
+        if (c == ' ' || c == '\n' || c == -1) {
             ++cardinality;
             sequence = 0;
             if (type == 'U') {
@@ -422,11 +444,12 @@ int main(int argc, char *argv[]) {
                 if (command == NULL) command = tmpStr;
             }
             tmpStr = NULL;
-            if (c == '\n') {
+            if (c == '\n' || c == -1) {
                 lineNum++;
                 lineChar = 0;
                 cardinality = 0;
                 if (type == 'S') {
+                    //printf("kokokokook %d\n", lineNum);
                     tmpSet->id = lineNum;
                     setArray.length++;
                     setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set *));
@@ -451,27 +474,16 @@ int main(int argc, char *argv[]) {
                     }
                     printf("\n");
                     //Relace
-                    if (strcmp(command, "reflexive") == 0) {
-                        isReflexive(findRelation(&relArray, firstArg), universum);
-                    }
-                    if (strcmp(command, "symmetric") == 0) { isSymmetric(findRelation(&relArray, firstArg)); }
-                    if (strcmp(command, "antisymmetric") == 0) { isAntiSymmetric(findRelation(&relArray, firstArg)); }
-                    if (strcmp(command, "transitive") == 0) { isTransitive(findRelation(&relArray, firstArg)); }
-                    if (strcmp(command, "function") == 0) { isFunction(findRelation(&relArray, firstArg)); }
-                    if (strcmp(command, "domain") == 0) { domain(findRelation(&relArray, firstArg)); }
-                    if (strcmp(command, "codomain") == 0) { codomain(findRelation(&relArray, firstArg)); }
-                    if (strcmp(command, "injective") == 0) {
-                        isInjective(findRelation(&relArray, firstArg), findSet(&setArray, secondArg),
-                                    findSet(&setArray, thirdArg), true);
-                    }
-                    if (strcmp(command, "surjective") == 0) {
-                        isSurjective(findRelation(&relArray, firstArg), findSet(&setArray, secondArg),
-                                     findSet(&setArray, thirdArg), true);
-                    }
-                    if (strcmp(command, "bijective") == 0) {
-                        isBijective(findRelation(&relArray, firstArg), findSet(&setArray, secondArg),
-                                    findSet(&setArray, thirdArg));
-                    }
+                    if(strcmp(command, "reflexive") == 0){isReflexive(findRelation(&relArray,firstArg), universum);}
+                    if(strcmp(command, "symmetric") == 0){isSymmetric(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "antisymmetric") == 0){isAntiSymmetric(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "transitive") == 0){isTransitive(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "function") == 0){isFunction(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "domain") == 0){domain(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "codomain") == 0){codomain(findRelation(&relArray,firstArg));}
+                    if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
+                    if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
+                    if(strcmp(command, "bijective") == 0){isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
                     //Mnoziny
                     if (strcmp(command, "empty") == 0) { empty(findSet(&setArray, firstArg)); }
                     if (strcmp(command, "card") == 0) { card(findSet(&setArray, firstArg)); }
@@ -501,6 +513,10 @@ int main(int argc, char *argv[]) {
                 }
                 type = ' ';
                 //command = NULL;
+                if(c == -1){
+                    if (feof(file))break;
+                    break;
+                }
             }
             continue;
         }
@@ -520,6 +536,8 @@ int main(int argc, char *argv[]) {
         *(tmpStr + sequence) = c;
         ++sequence;
     }
+
+    //Print
     printf("Universum: ");
     for (int i = 0; i < universum->cardinality; ++i) {
         printf("%s ", universum->items[i]);
@@ -533,22 +551,40 @@ int main(int argc, char *argv[]) {
         printf(")\n");
     }
 
-    // printf("\n");
     for (int i = 0; i < relArray.length; ++i) {
         printf("Rel %d ", relArray.relations[i]->id);
         for (int j = 0; j < relArray.relations[i]->cardinality; ++j) {
             printf("( %s ", relArray.relations[i]->items[j]->first);
             printf("%s )", relArray.relations[i]->items[j]->second);
-            /*for(int k = 0; j < relArray.relations; k++){
-                printf("%s", rel)
-            }*/
         }
         printf("\n");
     }
 
     codomain(relArray.relations[0]);
+    //Memory dealoc
+    setDestructor(universum);
+    setDestructor(tmpSet);
+    //relDestructor(tmpRel);
+   // relPairDestructor(tmpRelPair);
+    for(int i = 0; i < relArray.length; i++){
+        for(int j = 0; j < relArray.relations[i]->cardinality; j++){
+            relPairDestructor(relArray.relations[i]->items[j]);
+        }
+        relDestructor(relArray.relations[i]);
+        //relArray.relations[i];
+    }
+    for(int i = 0; i < setArray.length; i++){
+        setDestructor(setArray.sets[i]);
+    }
+    free(tmpStr);
+    free(cmdArgs);
+    free(relArray.relations);
+    free(setArray.sets);
+
 }
 
+
+// Rel functions
 void isReflexive(Relation *relation, Set *universum) {
     bool result = true;
     RelationPair tmpPair;
@@ -636,7 +672,13 @@ void domain(Relation *relation) {
 
     for (int i = 0; i < relation->cardinality; ++i) {
         if (!setContains(domain, relation->items[i]->first)) {
-            setIncrement(domain, relation->items[i]->first);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->first[j];
+            }
+            setIncrement(domain, newStr);
+            newStr = NULL;
         }
     }
 
@@ -649,7 +691,13 @@ void codomain(Relation *relation) {
 
     for (int i = 0; i < relation->cardinality; ++i) {
         if (!setContains(codomain, relation->items[i]->second)) {
-            setIncrement(codomain, relation->items[i]->second);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->second[j];
+            }
+            setIncrement(codomain, newStr);
+            newStr = NULL;
         }
     }
 
@@ -665,7 +713,13 @@ bool isInjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
             continue;
         }
         if (!setContains(codomain, relation->items[i]->second)) {
-            setIncrement(codomain, relation->items[i]->second);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->second[j];
+            }
+            setIncrement(codomain, newStr);
+            newStr = NULL;
         } else {
             result = false;
             break;
@@ -689,7 +743,13 @@ bool isSurjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
         }
 
         if (!setContains(codomain, relation->items[i]->second)) {
-            setIncrement(codomain, relation->items[i]->second);
+            unsigned long int length = strlen(relation->items[i]->second);
+            char *newStr = malloc(length * sizeof(char));
+            for (int j = 0; j < length; j++) {
+                *(newStr + j) = relation->items[i]->second[j];
+            }
+            setIncrement(codomain, newStr);
+            newStr = NULL;
         } /* else {
             result = false;
             break;
