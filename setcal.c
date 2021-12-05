@@ -391,7 +391,7 @@ int main(int argc, char *argv[]) {
             }
             if (type == 'S') {
                 setIncrement(tmpSet, tmpStr);
-              //  if (emptyS == true) tmpSet->cardinality = 0;
+                if (emptyS == true) tmpSet->cardinality = 0;
             }
             if (type == 'R') {
                 if (first) {
@@ -421,6 +421,7 @@ int main(int argc, char *argv[]) {
                 lineNum++;
                 lineChar = 0;
                 cardinality = 0;
+                emptyS = false;
                 if (type == 'S') {
                     tmpSet->id = lineNum;
                     setArray.length++;
@@ -571,6 +572,7 @@ int main(int argc, char *argv[]) {
         free(relArray.relations[i]);
     }
     free(relArray.relations);
+
     for (int i = 0; i < setArray.length; i++) {
         for (int j = 0; j < setArray.sets[i]->cardinality; ++j) {
             free(setArray.sets[i]->items[j]);

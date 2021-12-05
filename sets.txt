@@ -12,3 +12,4 @@ C card 4
 C subset 2 4
 C subseteq 2 4
 C equals 2 4
+C empty 3
