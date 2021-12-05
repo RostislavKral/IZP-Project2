@@ -120,6 +120,7 @@ void printSet(Set *set) {
 
 bool empty(Set *set) {
     bool result = set->cardinality == 0 ? true : false;
+    printf("%d", set->cardinality);
     printf("%s\n", result ? "true" : "false");
     return result;
 }
@@ -303,7 +304,7 @@ bool equals(Set *setA, Set *setB, bool print) {
 
 void subset(Set *setA, Set *setB) {
     if (equals(setA, setB, false)) {
-        printf("false");
+        printf("false \n");
         return;
     }
 
@@ -337,8 +338,6 @@ bool setContains(Set *set, char *item) {
 
     return false;
 }
-
-//void exitProgram()
 int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
