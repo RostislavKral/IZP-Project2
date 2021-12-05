@@ -31,13 +31,13 @@ Set *setCreator() {
     Set *set = malloc(sizeof(Set));
     set->id = 0;
     set->cardinality = 0;
-    set->items = malloc(1);
+    set->items = NULL;
     return set;
 }
 
 Relation *relCreator() {
     Relation *rel = malloc(sizeof(Relation));
-    rel->items = malloc(1);
+    rel->items = NULL;
     rel->cardinality = 0;
     rel->id = 0;
     return rel;
@@ -45,8 +45,8 @@ Relation *relCreator() {
 
 RelationPair *relPairCreator() {
     RelationPair *relPair = malloc(sizeof(Relation));
-    relPair->first = malloc(1);
-    relPair->second = malloc(1);
+    relPair->first = NULL;
+    relPair->second = NULL;
     return relPair;
 }
 void setDestructor(Set *set) {
@@ -214,7 +214,7 @@ int main (int argc, char *argv[]) {
     while (true) {
         c = fgetc(file);
         lineChar++;
-        if (feof(file))break;
+        //printf("C: %d \n", c);
         if (lineChar == 2){
             if(type == 'S' && c == 10){
                 tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
@@ -236,8 +236,7 @@ int main (int argc, char *argv[]) {
             type = c;
             continue;
         }
-        // TODO: když není řádek ukončen \n tak se celý řádek nepropíše
-        if (c == ' ' || c == '\n') {
+        if (c == ' ' || c == '\n' || c == -1) {
             ++cardinality;
             sequence = 0;
             if (type == 'U') {
@@ -270,7 +269,7 @@ int main (int argc, char *argv[]) {
                 if (command == NULL) command = tmpStr;
             }
             tmpStr = NULL;
-            if (c == '\n') {
+            if (c == '\n' || c == -1) {
                 lineNum++;
                 lineChar = 0;
                 cardinality = 0;
@@ -327,6 +326,10 @@ int main (int argc, char *argv[]) {
                 }
                 type = ' ';
                 //command = NULL;
+                if(c == -1){
+                    if (feof(file))break;
+                    break;
+                }
             }
             continue;
         }
