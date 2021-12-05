@@ -51,30 +51,37 @@ RelationPair *relPairCreator() {
     return relPair;
 }
 
-void *setDestructor(Set *set) {
+void setDestructor(Set *set) {
+    return;
     if (set) {
         for (int i = 0; i < set->cardinality; i++) {
+            // printf("++++ %p ++++", set->items[i]);
             free(set->items[i]);
-            if (set->items[i] != NULL) exit(EXIT_FAILURE);
+            // printf("++++ %p ++++", set->items[i]);
+            if (set->items[i] != NULL)
+                exit(EXIT_FAILURE);
         }
         free(set->items);
         free(set);
-        if (set != NULL) exit(EXIT_FAILURE);
+        if (set != NULL)
+            exit(EXIT_FAILURE);
     }
-    return 0;
+    // return 0;
 }
 
 void setIncrement(Set *set, char *item) {
     ++(set->cardinality);
     set->items = realloc(set->items, (set->cardinality) * sizeof(char *));
-    if (set->items == NULL) exit(EXIT_FAILURE);
+    if (set->items == NULL)
+        exit(EXIT_FAILURE);
     *(set->items + (set->cardinality - 1)) = item;
 }
 
 void relIncrement(Relation *rel, RelationPair *tmpRelPair) {
     ++(rel->cardinality);
     rel->items = realloc(rel->items, (rel->cardinality) * sizeof(char *));
-    if (rel->items == NULL) exit(EXIT_FAILURE);
+    if (rel->items == NULL)
+        exit(EXIT_FAILURE);
     *(rel->items + (rel->cardinality - 1)) = tmpRelPair;
 }
 
@@ -92,9 +99,9 @@ void domain(Relation *relation);
 
 void codomain(Relation *relation);
 
-void isInjective(Relation *relation, Set *setA, Set *setB);
+bool isInjective(Relation *relation, Set *setA, Set *setB, bool printResult);
 
-void isSurjective(Relation *relation, Set *setA, Set *setB);
+bool isSurjective(Relation *relation, Set *setA, Set *setB, bool printResult);
 
 void isBijective(Relation *relation, Set *setA, Set *setB);
 
@@ -146,6 +153,29 @@ void *findSet(SetArray *setArray, int num){
         }
     }
     //return NULL;
+}
+
+bool setContains (Set *set, char *item) {
+    for (int i = 0; i < set->cardinality; ++i) {
+        if (strcmp(set->items[i], item) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void printSet(Set *set) {
+    printf("S ");
+    for (int i = 0; i < set->cardinality; ++i) {
+        printf("%s", set->items[i]);
+
+        if (i != set->cardinality - 1) {
+            printf(" ");
+        }
+    }
+
+    printf("\n");
 }
 int main (int argc, char *argv[]) {
     if (argc != 2) {
@@ -222,7 +252,8 @@ int main (int argc, char *argv[]) {
                 if (command != NULL) {
                     cmdNum++;
                     cmdArgs = realloc(cmdArgs, sizeof(char *));
-                    if (cmdArgs == NULL)exit(EXIT_FAILURE);
+                    if (cmdArgs == NULL)
+                        exit(EXIT_FAILURE);
                     *(cmdArgs + (cmdNum - 1)) = tmpStr;
                 }
                 if (command == NULL) command = tmpStr;
@@ -264,8 +295,8 @@ int main (int argc, char *argv[]) {
                     if(strcmp(command, "function") == 0){isFunction(findRelation(&relArray,firstArg));}
                     if(strcmp(command, "domain") == 0){domain(findRelation(&relArray,firstArg));}
                     if(strcmp(command, "codomain") == 0){codomain(findRelation(&relArray,firstArg));}
-                    if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
-                    if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
+                    if(strcmp(command, "injective") == 0){isInjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
+                    if(strcmp(command, "surjective") == 0){isSurjective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg), true);}
                     if(strcmp(command, "bijective") == 0){isBijective(findRelation(&relArray,firstArg), findSet(&setArray,secondArg),findSet(&setArray, thirdArg));}
                     //Mnoziny
                     if(strcmp(command, "empty") == 0){empty(findSet(&setArray,firstArg));}
@@ -298,7 +329,8 @@ int main (int argc, char *argv[]) {
             }
         }
         tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
-        if (tmpStr == NULL) exit(EXIT_FAILURE);
+        if (tmpStr == NULL)
+            exit(EXIT_FAILURE);
         *(tmpStr + sequence) = c;
         ++sequence;
     }
@@ -328,7 +360,7 @@ int main (int argc, char *argv[]) {
         printf("\n");
     }
 
-    isReflexive(relArray.relations[0], universum);
+    codomain(relArray.relations[0]);
 }
 
 void isReflexive(Relation *relation, Set *universum) {
@@ -341,7 +373,7 @@ void isReflexive(Relation *relation, Set *universum) {
             result = false;
         }
     }
-    printf("%s", result ? "true" : "false");
+    printf("%s\n", result ? "true" : "false");
 }
 
 void isSymmetric(Relation *relation) {
@@ -373,11 +405,27 @@ void isAntiSymmetric(Relation *relation) {
             }
         }
     }
-    printf("%s", result ? "true" : "false");
+    printf("%s\n", result ? "true" : "false");
 }
 
 
-void isTransitive(Relation *relation) {}
+void isTransitive(Relation *relation) {
+    bool result = true;
+    RelationPair tmpPair;
+    for (int i = 0; i < relation->cardinality; ++i) {
+        for (int j = 0; j < relation->cardinality; ++j) {
+            tmpPair.first = relation->items[i]->first;
+            tmpPair.second = relation->items[j]->second;
+            if (strcmp(relation->items[i]->second, relation->items[j]->first) == 0) {
+                if (!containsRelationPair(relation, tmpPair)) {
+                    result = false;
+                    break;
+                }
+            }
+        }
+    }
+    printf("%s\n", result ? "true" : "false");
+}
 
 void isFunction(Relation *relation){
     bool result = true;
@@ -394,19 +442,92 @@ void isFunction(Relation *relation){
             }
         }
     }
-    printf("%s", result ? "true" : "false");
+    printf("%s\n", result ? "true" : "false");
 }
 
+void domain(Relation *relation) {
+    Set *domain = setCreator();
 
-void domain(Relation *relation) {}
+    for (int i = 0; i < relation->cardinality; ++i) {
+        if (!setContains(domain, relation->items[i]->first)) {
+            setIncrement(domain, relation->items[i]->first);
+        }
+    }
 
-void codomain(Relation *relation) {}
+    printSet(domain);
+    setDestructor(domain);
+}
 
-void isInjective(Relation *relation, Set *setA, Set *setB) {}
+void codomain(Relation *relation) {
+    Set *codomain = setCreator();
 
-void isSurjective(Relation *relation, Set *setA, Set *setB) {}
+    for (int i = 0; i < relation->cardinality; ++i) {
+        if (!setContains(codomain, relation->items[i]->second)) {
+            setIncrement(codomain, relation->items[i]->second);
+        }
+    }
 
-void isBijective(Relation *relation, Set *setA, Set *setB) {}
+    printSet(codomain);
+    setDestructor(codomain);
+}
+
+bool isInjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
+    bool result = true;
+    Set *codomain = setCreator();
+    for (int i = 0; i < relation->cardinality; ++i) {
+        if (!setContains(setA, relation->items[i]->first) || !setContains(setB, relation->items[i]->second)) {
+            continue;
+        }
+        if (!setContains(codomain, relation->items[i]->second)) {
+            setIncrement(codomain, relation->items[i]->second);
+        } else {
+            result = false;
+            break;
+        }
+    }
+
+    setDestructor(codomain);
+    if (printResult) {
+        printf("%s\n", result ? "true" : "false");
+    }
+    return result;
+}
+
+bool isSurjective(Relation *relation, Set *setA, Set *setB, bool printResult) {
+    bool result = true;
+
+    Set *codomain = setCreator();
+    for (int i = 0; i < relation->cardinality; ++i) {
+        if (!setContains(setA, relation->items[i]->first) || !setContains(setB, relation->items[i]->second)) {
+            continue;
+        }
+
+        if (!setContains(codomain, relation->items[i]->second)) {
+            setIncrement(codomain, relation->items[i]->second);
+        } /* else {
+            result = false;
+            break;
+        } */
+    }
+
+    result = setB->cardinality == codomain->cardinality;
+    setDestructor(codomain);
+    if (printResult){
+        printf("%s\n", result ? "true" : "false");
+    }
+    return result;
+}
+
+void isBijective(Relation *relation, Set *setA, Set *setB) {
+    if (setB->cardinality != setA->cardinality) {
+        printf("false\n");
+        return;
+    }
+
+    bool result = isInjective(relation, setA, setB, false) && isSurjective(relation, setA, setB, false);
+
+    printf("%s\n", result ? "true" : "false");
+}
 
 bool containsRelationPair(Relation *relation, RelationPair relationPair) {
     for (int i = 0; i < relation->cardinality; ++i) {
