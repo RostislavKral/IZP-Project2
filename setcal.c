@@ -126,7 +126,7 @@ void printSet(Set *set) {
 
 bool empty(Set *set, bool print) {
     bool result = set->cardinality == 0 ? true : false;
-    print ? printf("%s\n", result ? "true" : "false") : 0;
+    print ? printf("%s\n", result ? "true" : "false"):0;
     return result;
 }
 
@@ -353,7 +353,7 @@ int main(int argc, char *argv[]) {
     int cardinality = 0, sequence = 0, lineNum = 0, lineChar = 0;
     char *tmpStr = NULL;
     char *tmpRelItem = NULL;
-    bool first = false, second = false;
+    bool first = false, second = false, emptyS = false;
     char *command = NULL;
     char **cmdArgs = NULL;
     int cmdNum = 0;
@@ -365,8 +365,9 @@ int main(int argc, char *argv[]) {
                 tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
                 if (tmpStr == NULL)
                     exit(EXIT_FAILURE);
-                *(tmpStr + sequence) = 0;
+                *(tmpStr + sequence) = 'E';
                 ++sequence;
+                emptyS = true;
                 c = '\n';
             } else {
                 continue;
@@ -390,6 +391,7 @@ int main(int argc, char *argv[]) {
             }
             if (type == 'S') {
                 setIncrement(tmpSet, tmpStr);
+                if (emptyS == true) tmpSet->cardinality = 0;
             }
             if (type == 'R') {
                 if (first) {
