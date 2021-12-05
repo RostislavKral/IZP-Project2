@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <string.h>
-#include <ctype.h>
 
 typedef struct {
     int id;
@@ -50,24 +49,23 @@ RelationPair *relPairCreator() {
     relPair->second = malloc(1);
     return relPair;
 }
-
 void setDestructor(Set *set) {
-    return;
-    if (set) {
-        for (int i = 0; i < set->cardinality; i++) {
-            // printf("++++ %p ++++", set->items[i]);
-            free(set->items[i]);
-            // printf("++++ %p ++++", set->items[i]);
-            if (set->items[i] != NULL)
-                exit(EXIT_FAILURE);
-        }
-        free(set->items);
-        free(set);
-        if (set != NULL)
-            exit(EXIT_FAILURE);
-    }
-    // return 0;
+    free(set->items);
+    free(set);
+    //if(set != NULL) exit(EXIT_FAILURE);
 }
+void relPairDestructor(RelationPair *relationPair){
+    free(relationPair->first);
+    free(relationPair->second);
+    free(relationPair);
+    //if(relationPair != NULL) exit(EXIT_FAILURE);
+}
+void relDestructor(Relation *relation){
+    free(relation->items);
+    free(relation);
+    //if(relation != NULL) exit(EXIT_FAILURE);
+}
+
 
 void setIncrement(Set *set, char *item) {
     ++(set->cardinality);
@@ -177,6 +175,7 @@ void printSet(Set *set) {
 
     printf("\n");
 }
+//void exitProgram()
 int main (int argc, char *argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Invalid number of args\n");
@@ -216,7 +215,19 @@ int main (int argc, char *argv[]) {
         c = fgetc(file);
         lineChar++;
         if (feof(file))break;
-        if (lineChar == 2)continue;
+        if (lineChar == 2){
+            if(type == 'S' && c == 10){
+                tmpStr = realloc(tmpStr, (sequence + 1) * sizeof(char));
+                if (tmpStr == NULL)
+                    exit(EXIT_FAILURE);
+                *(tmpStr + sequence) = 0;
+                ++sequence;
+                c = '\n';
+            } else {
+                continue;
+            }
+            //continue;
+        }
         if (type == ' ') {
             if (c != 'U' && c != 'C' && c != 'R' && c != 'S') {
                 printf("Unknown command %c in file %s on line %d \n", c, argv[1], lineNum + 1);
@@ -264,6 +275,7 @@ int main (int argc, char *argv[]) {
                 lineChar = 0;
                 cardinality = 0;
                 if (type == 'S') {
+                    //printf("kokokokook %d\n", lineNum);
                     tmpSet->id = lineNum;
                     setArray.length++;
                     setArray.sets = realloc(setArray.sets, setArray.length * sizeof(Set *));
@@ -334,6 +346,8 @@ int main (int argc, char *argv[]) {
         *(tmpStr + sequence) = c;
         ++sequence;
     }
+
+    //Print
     printf("Universum: ");
     for (int i = 0; i < universum->cardinality; ++i) {
         printf("%s ", universum->items[i]);
@@ -347,22 +361,40 @@ int main (int argc, char *argv[]) {
         printf(")\n");
     }
 
-    // printf("\n");
     for (int i = 0; i < relArray.length; ++i) {
         printf("Rel %d ", relArray.relations[i]->id);
         for (int j = 0; j < relArray.relations[i]->cardinality; ++j) {
             printf("( %s ", relArray.relations[i]->items[j]->first);
             printf("%s )", relArray.relations[i]->items[j]->second);
-            /*for(int k = 0; j < relArray.relations; k++){
-                printf("%s", rel)
-            }*/
         }
         printf("\n");
     }
 
     codomain(relArray.relations[0]);
+    //Memory dealoc
+    setDestructor(universum);
+    setDestructor(tmpSet);
+    //relDestructor(tmpRel);
+   // relPairDestructor(tmpRelPair);
+    for(int i = 0; i < relArray.length; i++){
+        for(int j = 0; j < relArray.relations[i]->cardinality; j++){
+            relPairDestructor(relArray.relations[i]->items[j]);
+        }
+        relDestructor(relArray.relations[i]);
+        //relArray.relations[i];
+    }
+    for(int i = 0; i < setArray.length; i++){
+        setDestructor(setArray.sets[i]);
+    }
+    free(tmpStr);
+    free(cmdArgs);
+    free(relArray.relations);
+    free(setArray.sets);
+
 }
 
+
+// Rel functions
 void isReflexive(Relation *relation, Set *universum) {
     bool result = true;
     RelationPair tmpPair;
